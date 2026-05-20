@@ -792,6 +792,69 @@
     border-color: var(--ge-blue);
   }
 
+  .vents-modal-box {
+    max-width: 500px;
+    padding: 48px 40px 40px;
+  }
+
+  .vents-modal-box h3 {
+    color: var(--ge-ink);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0 auto 28px;
+    max-width: 370px;
+  }
+
+  .vents-modal-box .m-btn {
+    min-width: 132px;
+  }
+
+  .q-wrap.q-wrap-wide {
+    max-width: 940px;
+  }
+
+  .q-wrap.q-wrap-wide .q-title {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .room-solution-wrap {
+    text-align: center;
+  }
+
+  .room-count-select {
+    appearance: auto;
+    background: #fff;
+    border: 1px solid var(--ge-line);
+    border-radius: 0;
+    color: var(--ge-muted);
+    font-size: 14px;
+    height: 31px;
+    margin-top: -30px;
+    padding: 0 8px;
+    width: 80px;
+  }
+
+  .room-solution-subtitle {
+    color: var(--ge-muted);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 28px 0 26px;
+  }
+
+  .room-solution-cards {
+    display: grid;
+    gap: 15px;
+    grid-template-columns: repeat(4, 201px);
+    justify-content: center;
+  }
+
+  .room-solution-wrap .next-btn {
+    margin-top: 22px;
+  }
+
   .start-over:hover,
   .help-btn:hover {
     color: var(--ge-blue);
@@ -1168,6 +1231,10 @@
       grid-template-columns: 1fr;
       gap: 10px;
     }
+
+    .room-solution-cards {
+      grid-template-columns: repeat(2, minmax(145px, 201px));
+    }
   }
 
   @media (max-width: 420px) {
@@ -1184,6 +1251,10 @@
 
     .progress-dots {
       transform: scale(.82);
+    }
+
+    .room-solution-cards {
+      grid-template-columns: minmax(145px, 201px);
     }
   }
 </style>
@@ -1262,12 +1333,11 @@
 
 <!-- ══════════ VENTS MODAL ══════════ -->
 <div id="vents-modal" class="modal-overlay hidden">
-  <div class="modal-box">
-    <h3>Do you have existing ductwork / vents?</h3>
-    <p>This helps us find the right HVAC solution — central systems need ductwork while ductless mini-splits don't.</p>
+  <div class="modal-box vents-modal-box">
+    <h3>Does your home have vents in the ceilings, floors, or walls?</h3>
     <div class="modal-actions">
-      <button class="m-btn m-btn-primary"  onclick="handleVents(true)">Yes, I have vents</button>
-      <button class="m-btn m-btn-outline"  onclick="handleVents(false)">No vents</button>
+      <button class="m-btn m-btn-primary" onclick="handleVents(true)">Yes</button>
+      <button class="m-btn m-btn-outline" onclick="handleVents(false)">No</button>
     </div>
   </div>
 </div>
@@ -1414,12 +1484,13 @@ const QUESTIONS = {
     },
     {
       id: 'roomSolution',
-      q: 'Which room coverage do you need?',
-      type: 'cards',
+      q: 'How many rooms are you looking to have a solution for?',
+      type: 'roomSolution',
       opts: [
-        { val: 'single', lbl: 'Single Room', icon: 'room'  },
-        { val: 'multi',  lbl: 'Multi Room',  icon: 'rooms' },
-        { val: 'whole',  lbl: 'Whole Home',  icon: 'house' }
+        { val: 'highwall-hvac',   lbl: 'Highwall HVAC',   icon: 'highwall-hvac'   },
+        { val: 'casette',         lbl: 'Casette',         icon: 'casette'         },
+        { val: 'console',         lbl: 'Console',         icon: 'console'         },
+        { val: 'mid-static-duct', lbl: 'Mid-Static Duct', icon: 'mid-static-duct' }
       ]
     }
   ],
@@ -1489,6 +1560,7 @@ function render() {
 
   const wrap = document.createElement('div');
   wrap.className = 'q-wrap';
+  if (q.type === 'roomSolution') wrap.classList.add('q-wrap-wide');
 
   const title = document.createElement('h2');
   title.className = 'q-title';
@@ -1498,6 +1570,7 @@ function render() {
   if      (q.type === 'cards-radio') buildCardsRadio(wrap, q);
   else if (q.type === 'cards')       buildCards(wrap, q);
   else if (q.type === 'sqft')        buildSqft(wrap);
+  else if (q.type === 'roomSolution') buildRoomSolution(wrap, q);
   else if (q.type === 'gasForm')     buildGasForm(wrap);
   else if (q.type === 'elecForm')    buildElecForm(wrap);
   else if (q.type === 'hpForm')      buildHpForm(wrap);
@@ -1552,11 +1625,7 @@ function buildCardsRadio(wrap, q) {
       wrap.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
       setTimeout(() => {
-        if (S.radioAnswer === 'replacement') {
-          document.getElementById('vents-modal').classList.remove('hidden');
-        } else {
-          S.qStep = 2; render();
-        }
+        document.getElementById('vents-modal').classList.remove('hidden');
       }, 280);
     };
     cards.appendChild(card);
@@ -1633,11 +1702,53 @@ function handleZip() {
   showResults();
 }
 
+/* HVAC individual room solution */
+function buildRoomSolution(wrap, q) {
+  const div = document.createElement('div');
+  div.className = 'room-solution-wrap';
+  const roomCount = S.answers.roomCount || '3';
+  const selected = S.answers[q.id] || '';
+  const roomOptions = ['1', '2', '3', '4', '5+'].map(count =>
+    `<option value="${count}" ${roomCount === count ? 'selected' : ''}>${count}</option>`
+  ).join('');
+
+  div.innerHTML = `
+    <select id="room-count" class="room-count-select" onchange="S.answers.roomCount = this.value">
+      ${roomOptions}
+    </select>
+    <div class="room-solution-subtitle">Are you looking for one of these in each individual room?</div>
+    <div class="room-solution-cards"></div>
+    <button id="room-solution-next" class="next-btn" onclick="submitRoomSolution()" ${selected ? '' : 'disabled'}>Next</button>`;
+
+  const cards = div.querySelector('.room-solution-cards');
+  q.opts.forEach(o => {
+    const card = document.createElement('div');
+    card.className = 'opt-card' + (selected === o.val ? ' selected' : '');
+    card.innerHTML = svgIcon(o.icon, 58) + `<span>${o.lbl}</span>`;
+    card.onclick = () => {
+      S.answers[q.id] = o.val;
+      cards.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      div.querySelector('#room-solution-next').disabled = false;
+    };
+    cards.appendChild(card);
+  });
+
+  wrap.appendChild(div);
+}
+
+function submitRoomSolution() {
+  const selected = S.answers.roomSolution;
+  if (!selected) return;
+  S.answers.roomCount = document.getElementById('room-count').value;
+  showResults();
+}
+
 /* ─── Vents modal response ─── */
 function handleVents(hasVents) {
   document.getElementById('vents-modal').classList.add('hidden');
   S.answers.hasVents = String(hasVents);
-  S.qStep = hasVents ? 2 : 3;  // sq-footage or room-solution
+  S.qStep = hasVents ? 2 : 3;  // square footage or individual room solution
   render();
 }
 
@@ -2150,6 +2261,45 @@ function svgIcon(type, size) {
       <path d="M33 16h5v10h-5z"/>
       <path d="M38 21l10-8 5 5-9 9"/>
       <path d="M32 33c4 5 6 8 6 11a6 6 0 01-12 0c0-3 2-6 6-11z"/>
+    </svg>`,
+    'highwall-hvac': `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="12" y="19" width="40" height="14" rx="2"/>
+      <path d="M16 29h32"/>
+      <path d="M21 39v5"/>
+      <path d="M29 39v5"/>
+      <path d="M37 39v5"/>
+      <path d="M45 39v5"/>
+      <path d="M17 38c2 2 4 2 6 0"/>
+      <path d="M25 38c2 2 4 2 6 0"/>
+      <path d="M33 38c2 2 4 2 6 0"/>
+      <path d="M41 38c2 2 4 2 6 0"/>
+    </svg>`,
+    casette: `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="15" y="15" width="34" height="34" rx="4"/>
+      <rect x="23" y="23" width="18" height="18" rx="2"/>
+      <path d="M20 12h24"/>
+      <path d="M20 52h24"/>
+      <path d="M12 20v24"/>
+      <path d="M52 20v24"/>
+      <path d="M28 29h8"/>
+      <path d="M28 35h8"/>
+    </svg>`,
+    console: `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="18" y="13" width="28" height="38" rx="4"/>
+      <rect x="25" y="22" width="14" height="14" rx="2"/>
+      <path d="M24 43h16"/>
+      <path d="M24 47h16"/>
+      <path d="M28 27h8"/>
+      <path d="M28 32h8"/>
+    </svg>`,
+    'mid-static-duct': `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 24h34v26H14z"/>
+      <path d="M48 24l8-5v26l-8 5"/>
+      <path d="M14 24l8-5h34"/>
+      <path d="M20 30h22"/>
+      <path d="M20 35h22"/>
+      <path d="M20 40h22"/>
+      <path d="M20 45h22"/>
     </svg>`,
     house: `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1v-9.5z"/>
