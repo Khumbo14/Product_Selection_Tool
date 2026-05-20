@@ -1,0 +1,2217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GE Appliances – Product Selection Tool</title>
+<style>
+  /* ── Reset ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #fff; color: #333; min-height: 100vh; }
+  button { font-family: inherit; cursor: pointer; }
+  .hidden { display: none !important; }
+
+  /* ── Header ── */
+  .page-header {
+    background: #003D7A;
+    padding: 28px 20px;
+    text-align: center;
+  }
+  .page-header h1 {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+
+  /* ════════════════════════════
+     STEP 1 – SOLUTION SELECTOR
+  ════════════════════════════ */
+  #step-selection {
+    padding: 70px 20px;
+    text-align: center;
+  }
+  #step-selection h2 {
+    font-size: 22px;
+    font-weight: 400;
+    color: #444;
+    margin-bottom: 52px;
+  }
+  .solution-cards {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  .solution-card {
+    border: 2px solid #ccc;
+    border-radius: 12px;
+    padding: 60px 72px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+    min-width: 280px;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .solution-card:hover {
+    border-color: #003D7A;
+    box-shadow: 0 4px 24px rgba(0,61,122,.14);
+  }
+  .solution-card svg { color: #8a9ab5; transition: color .2s; }
+  .solution-card:hover svg { color: #003D7A; }
+  .solution-card span {
+    font-size: 13px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: #666;
+    font-weight: 600;
+    line-height: 1.6;
+    transition: color .2s;
+  }
+  .solution-card:hover span { color: #003D7A; }
+
+  /* ════════════════════════════
+     STEP 2 – QUESTIONNAIRE
+  ════════════════════════════ */
+  #step-questionnaire { padding-bottom: 80px; }
+
+  .back-btn {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 20px 24px;
+    max-width: 920px;
+    margin: 0 auto;
+    transition: color .2s;
+  }
+  .back-btn:hover { color: #003D7A; }
+
+  /* Progress dots */
+  .progress-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0 44px;
+  }
+  .dot {
+    width: 12px; height: 12px;
+    border-radius: 2px;
+    border: 1px solid #ccc;
+    transition: all .25s;
+    flex-shrink: 0;
+  }
+  .dot.active  { background: #003D7A; border-color: #003D7A; }
+  .dot.done    { background: #0066CC; border-color: #0066CC; }
+  .dot-line    { width: 48px; height: 1px; background: #d0d0d0; flex-shrink: 0; }
+
+  /* Question wrapper */
+  .q-wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  .q-title {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 400;
+    color: #555;
+    margin-bottom: 44px;
+  }
+
+  /* Radio row */
+  .radio-row {
+    display: flex;
+    justify-content: center;
+    gap: 44px;
+    margin-bottom: 40px;
+  }
+  .radio-row label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    color: #555;
+    cursor: pointer;
+  }
+  .radio-row input[type="radio"] { width: 17px; height: 17px; accent-color: #003D7A; }
+
+  /* Option cards */
+  .opt-cards {
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+    flex-wrap: wrap;
+  }
+  .opt-card {
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    padding: 32px 44px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    min-width: 150px;
+    transition: border-color .2s, background .2s;
+    cursor: pointer;
+  }
+  .opt-card:hover, .opt-card.selected {
+    border-color: #003D7A;
+    background: #eef4ff;
+  }
+  .opt-card svg { color: #777; transition: color .2s; }
+  .opt-card:hover svg, .opt-card.selected svg { color: #003D7A; }
+  .opt-card span {
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #555;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  /* Next button */
+  .next-btn {
+    display: block;
+    margin: 44px auto 0;
+    background: #003D7A;
+    color: #fff;
+    border: none;
+    padding: 12px 52px;
+    border-radius: 6px;
+    font-size: 15px;
+    transition: background .2s;
+  }
+  .next-btn:hover { background: #002952; }
+  .next-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+  /* Sq-footage input */
+  .sqft-wrap { text-align: center; padding: 10px 0; }
+  .sqft-input {
+    border: none;
+    border-bottom: 3px solid #003D7A;
+    font-size: 52px;
+    font-weight: 300;
+    color: #003D7A;
+    text-align: center;
+    width: 220px;
+    outline: none;
+    background: transparent;
+  }
+  .sqft-unit { font-size: 14px; color: #999; margin-top: 8px; }
+
+  /* Form grid */
+  .form-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+  .form-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 28px;
+    max-width: 580px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .form-group label {
+    display: block;
+    text-align: center;
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 10px;
+  }
+  .form-group select {
+    width: 100%;
+    padding: 10px 36px 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #444;
+    appearance: none;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;
+    cursor: pointer;
+  }
+
+  /* ═══════════
+     MODALS
+  ═══════════ */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.48);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-box {
+    background: #fff;
+    border-radius: 12px;
+    padding: 44px 40px;
+    max-width: 460px;
+    width: 92%;
+    text-align: center;
+    box-shadow: 0 12px 48px rgba(0,0,0,.18);
+  }
+  .modal-box h3 { font-size: 20px; color: #222; margin-bottom: 12px; }
+  .modal-box p  { font-size: 14px; color: #666; margin-bottom: 32px; line-height: 1.6; }
+  .modal-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .m-btn {
+    padding: 11px 28px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all .2s;
+  }
+  .m-btn-primary { background: #003D7A; color: #fff; border: 2px solid #003D7A; }
+  .m-btn-primary:hover { background: #002952; border-color: #002952; }
+  .m-btn-outline { background: #fff; color: #003D7A; border: 2px solid #003D7A; }
+  .m-btn-outline:hover { background: #eef4ff; }
+  .zip-input {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 11px 16px;
+    font-size: 18px;
+    text-align: center;
+    width: 170px;
+    display: block;
+    margin: 0 auto 28px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .zip-input:focus { border-color: #003D7A; }
+
+  /* ════════════════════════════
+     STEP 3 – RESULTS
+  ════════════════════════════ */
+  #step-results { padding: 44px 24px 80px; max-width: 1120px; margin: 0 auto; }
+
+  .start-over {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 18px;
+    padding: 0;
+    transition: color .2s;
+  }
+  .start-over:hover { color: #003D7A; }
+
+  .res-header { margin-bottom: 36px; }
+  .res-header h2 { font-size: 26px; color: #222; margin-bottom: 6px; }
+  .res-header p  { font-size: 14px; color: #666; }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 44px;
+  }
+
+  /* Product card */
+  .prod-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    transition: box-shadow .25s;
+  }
+  .prod-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.12); }
+
+  .prod-badge {
+    position: absolute;
+    top: 14px; right: 14px;
+    background: #1d4ed8;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 5px;
+    letter-spacing: .5px;
+    z-index: 2;
+  }
+
+  .prod-img {
+    width: 100%;
+    height: 185px;
+    background: linear-gradient(135deg, #dce9ff, #b8d0ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .prod-body { padding: 20px; }
+
+  .prod-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .prod-name  { font-size: 16px; font-weight: 700; color: #1a1a1a; }
+  .prod-model { font-size: 12px; color: #999; margin-top: 3px; }
+  .prod-price { font-size: 22px; font-weight: 700; color: #1d4ed8; white-space: nowrap; }
+
+  .eff-badge {
+    display: inline-block;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 11px;
+    color: #555;
+    margin-top: 4px;
+  }
+
+  .stars { display: flex; align-items: center; gap: 6px; margin: 10px 0 8px; }
+  .star  { font-size: 16px; color: #d1d5db; }
+  .star.on { color: #fbbf24; }
+  .rating-text { font-size: 12px; color: #777; }
+
+  .prod-desc { font-size: 13px; color: #666; line-height: 1.55; margin-bottom: 14px; }
+
+  .feat-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    color: #444;
+    margin-bottom: 6px;
+  }
+  .feat-check { color: #16a34a; font-weight: 700; flex-shrink: 0; }
+
+  /* Accordion inside card */
+  .acc { border: 1px solid #eee; border-radius: 6px; margin: 14px 0; overflow: hidden; }
+  .acc-item { border-bottom: 1px solid #eee; }
+  .acc-item:last-child { border-bottom: none; }
+  .acc-hdr {
+    padding: 11px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: #444;
+    cursor: pointer;
+    user-select: none;
+    transition: background .15s;
+  }
+  .acc-hdr:hover { background: #f8f9fb; }
+  .acc-arrow { font-size: 11px; color: #888; transition: transform .2s; }
+  .acc-item.open .acc-arrow { transform: rotate(180deg); }
+  .acc-body {
+    display: none;
+    padding: 0 14px 12px;
+    font-size: 13px;
+    color: #666;
+    line-height: 1.6;
+  }
+  .acc-item.open .acc-body { display: block; }
+
+  .prod-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+  .btn-view {
+    background: #1d4ed8;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: background .2s;
+  }
+  .btn-view:hover { background: #1e40af; }
+  .btn-cmp {
+    background: #fff;
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: background .2s;
+  }
+  .btn-cmp:hover { background: #f5f5f5; }
+
+  /* Help section */
+  .help-box {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    background: #f9fafb;
+    padding: 28px 32px;
+  }
+  .help-box h3 { font-size: 18px; color: #222; margin-bottom: 6px; }
+  .help-box p  { font-size: 14px; color: #666; margin-bottom: 18px; }
+  .help-btns  { display: flex; gap: 12px; flex-wrap: wrap; }
+  .help-btn {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color .2s, color .2s;
+  }
+  .help-btn:hover { border-color: #003D7A; color: #003D7A; }
+
+  /* Responsive */
+  @media (max-width: 860px) {
+    .products-grid { grid-template-columns: 1fr; }
+    .form-grid-3   { grid-template-columns: 1fr; }
+    .form-grid-2   { grid-template-columns: 1fr; }
+    .solution-card { padding: 44px 40px; min-width: 220px; }
+  }
+  @media (max-width: 520px) {
+    .opt-card { padding: 24px 28px; }
+    .radio-row { gap: 24px; }
+  }
+
+  /* GE Appliances color pass */
+  :root {
+    --ge-blue: #1f4578;
+    --ge-blue-dark: #173762;
+    --ge-link-blue: #005eb8;
+    --ge-ink: #171717;
+    --ge-muted: #555555;
+    --ge-soft: #777777;
+    --ge-line: #d5d5d5;
+    --ge-light: #f4f4f2;
+    --ge-blue-tint: #f3f7fc;
+  }
+
+  body {
+    background: #fff;
+    color: var(--ge-ink);
+  }
+
+  .page-header {
+    min-height: 192px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(90deg, #3b769e 0%, var(--ge-blue) 52%, var(--ge-blue-dark) 100%);
+    border: 6px solid #f4f4f2;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.16);
+    padding: 40px 28px;
+    color: #fff;
+    text-align: center;
+  }
+
+  .page-header h1 {
+    color: #fff;
+    font-size: clamp(26px, 2.4vw, 34px);
+    font-weight: 800;
+    letter-spacing: .35px;
+    line-height: 1.1;
+    text-transform: uppercase;
+    text-shadow: 0 2px 6px rgba(0,0,0,.2);
+  }
+
+  #step-selection {
+    min-height: calc(100vh - 192px);
+    padding: 76px 20px 64px;
+  }
+
+  #step-selection h2,
+  .q-title {
+    color: var(--ge-blue);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  #step-selection h2 {
+    margin-bottom: 60px;
+  }
+
+  .solution-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 201px);
+    justify-content: center;
+    gap: 15px;
+    max-width: 417px;
+  }
+
+  .opt-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 201px);
+    justify-content: start;
+    gap: 15px;
+    max-width: 633px;
+  }
+
+  .solution-card,
+  .opt-card {
+    width: 201px;
+    height: 201px;
+    min-width: 0;
+    padding: 0 14px 17px;
+    border: 1px solid var(--ge-line);
+    border-radius: 0;
+    background: #fff;
+    box-shadow: none;
+    color: var(--ge-muted);
+    gap: 14px;
+    justify-content: center;
+    transition: border-color .16s, color .16s, background .16s;
+  }
+
+  .solution-card:hover,
+  .solution-card:focus-visible,
+  .opt-card:hover,
+  .opt-card:focus-visible,
+  .opt-card.selected {
+    border-color: var(--ge-blue);
+    background: var(--ge-blue-tint);
+    box-shadow: none;
+    color: var(--ge-blue);
+    outline: none;
+  }
+
+  .solution-card svg,
+  .opt-card svg {
+    width: 62px;
+    height: 62px;
+    color: var(--ge-soft);
+    transition: color .16s;
+  }
+
+  .solution-card:hover svg,
+  .solution-card:hover span,
+  .solution-card:focus-visible svg,
+  .solution-card:focus-visible span,
+  .opt-card:hover svg,
+  .opt-card:hover span,
+  .opt-card:hover small,
+  .opt-card:focus-visible svg,
+  .opt-card:focus-visible span,
+  .opt-card:focus-visible small,
+  .opt-card.selected svg,
+  .opt-card.selected span,
+  .opt-card.selected small {
+    color: var(--ge-blue);
+  }
+
+  .solution-card span,
+  .opt-card span {
+    color: var(--ge-ink);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1.2;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .opt-card small {
+    color: var(--ge-muted);
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.15;
+    margin-top: -8px;
+    text-transform: uppercase;
+  }
+
+  #step-questionnaire {
+    min-height: 100vh;
+    padding-bottom: 56px;
+  }
+
+  .back-btn {
+    width: min(1012px, calc(100% - 32px));
+    max-width: none;
+    margin: 0 auto;
+    padding: 13px 0 0;
+    color: var(--ge-blue);
+    font-size: 14px;
+    gap: 4px;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .back-btn:hover,
+  .back-btn:focus-visible {
+    color: var(--ge-blue-dark);
+    outline: none;
+  }
+
+  .progress-dots {
+    gap: 0;
+    width: min(530px, calc(100% - 32px));
+    margin: 0 auto;
+    justify-content: flex-start;
+    padding: 5px 0 37px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border: 1px solid var(--ge-line);
+    border-radius: 0;
+    background: #fff;
+  }
+
+  .dot.active,
+  .dot.done {
+    background: var(--ge-blue);
+    border-color: var(--ge-blue);
+  }
+
+  .dot-line {
+    width: 68px;
+    height: 1px;
+    background: repeating-linear-gradient(
+      to right,
+      var(--ge-line) 0,
+      var(--ge-line) 2px,
+      transparent 2px,
+      transparent 6px
+    );
+  }
+
+  .q-wrap {
+    max-width: 700px;
+    padding: 0 16px;
+  }
+
+  .q-title {
+    width: min(633px, 100%);
+    margin-bottom: 58px;
+  }
+
+  .radio-row {
+    gap: 36px;
+    margin-top: -25px;
+    margin-bottom: 32px;
+  }
+
+  .radio-row label {
+    color: var(--ge-muted);
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .radio-row input[type="radio"] {
+    accent-color: var(--ge-blue);
+  }
+
+  .option-hint {
+    width: 201px;
+    height: 201px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 26px;
+    color: var(--ge-muted);
+  }
+
+  .option-hint .hint-arrow {
+    font-size: 40px;
+    font-weight: 300;
+    line-height: 1;
+  }
+
+  .option-hint span {
+    max-width: 92px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.35;
+    text-align: center;
+  }
+
+  .next-btn {
+    background: var(--ge-blue);
+    border-radius: 0;
+  }
+
+  .next-btn:hover {
+    background: var(--ge-blue-dark);
+  }
+
+  .sqft-input {
+    border-bottom-color: var(--ge-blue);
+    color: var(--ge-blue);
+  }
+
+  .sqft-unit,
+  .form-group label {
+    color: var(--ge-muted);
+    font-weight: 700;
+  }
+
+  .form-group select,
+  .zip-input {
+    border-color: var(--ge-line);
+    border-radius: 0;
+    color: var(--ge-ink);
+  }
+
+  .modal-box {
+    border-radius: 0;
+  }
+
+  .m-btn-primary,
+  .prod-badge,
+  .btn-view {
+    background: var(--ge-blue);
+    border-color: var(--ge-blue);
+  }
+
+  .m-btn-primary:hover,
+  .btn-view:hover {
+    background: var(--ge-blue-dark);
+    border-color: var(--ge-blue-dark);
+  }
+
+  .m-btn-outline {
+    color: var(--ge-blue);
+    border-color: var(--ge-blue);
+  }
+
+  .m-btn-outline:hover {
+    background: var(--ge-blue-tint);
+  }
+
+  .zip-input:focus {
+    border-color: var(--ge-blue);
+  }
+
+  .start-over:hover,
+  .help-btn:hover {
+    color: var(--ge-blue);
+  }
+
+  .help-btn:hover {
+    border-color: var(--ge-blue);
+  }
+
+  .prod-img {
+    background: linear-gradient(135deg, #eef3f8, #dbe7f3);
+  }
+
+  .prod-price {
+    color: var(--ge-blue);
+  }
+
+  #step-results {
+    max-width: none;
+    padding: 44px 20px 72px;
+  }
+
+  .res-header {
+    text-align: center;
+    margin-bottom: 26px;
+  }
+
+  .res-header h2 {
+    color: var(--ge-blue);
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .res-header p,
+  .help-box {
+    display: none;
+  }
+
+  .products-grid {
+    display: block;
+    margin: 0 auto;
+    overflow-x: auto;
+    padding: 0 0 18px;
+  }
+
+  .rec-matrix {
+    width: max-content;
+    margin: 0 auto;
+    color: var(--ge-muted);
+  }
+
+  .rec-grid {
+    display: grid;
+    grid-template-columns: 240px repeat(var(--product-count), 158px);
+    align-items: stretch;
+  }
+
+  .rec-priority-card {
+    align-self: start;
+    width: 214px;
+    min-height: 116px;
+    margin: 20px 18px 0 10px;
+    border: 1px solid var(--ge-line);
+    background: #fff;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .rec-priority-main,
+  .rec-priority-edit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px 10px;
+    text-align: center;
+  }
+
+  .rec-priority-edit {
+    border-left: 1px solid var(--ge-line);
+    background: var(--ge-blue-tint);
+    color: var(--ge-blue);
+  }
+
+  .rec-priority-card svg {
+    width: 34px;
+    height: 34px;
+    color: var(--ge-blue);
+  }
+
+  .rec-priority-label {
+    color: var(--ge-blue);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.15;
+    text-transform: uppercase;
+  }
+
+  .rec-update-btn {
+    background: none;
+    border: 0;
+    color: var(--ge-blue);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.15;
+    padding: 0;
+  }
+
+  .rec-product-head {
+    min-height: 204px;
+    padding: 16px 12px 14px;
+    border-left: 1px solid var(--ge-line);
+    background: #fff;
+  }
+
+  .rec-product-head.is-recommended {
+    margin-top: -18px;
+    border: 2px solid var(--ge-blue);
+    border-bottom: 0;
+    border-radius: 9px 9px 0 0;
+    background: #fff;
+    box-shadow: 0 12px 28px rgba(31,69,120,.14);
+  }
+
+  .rec-img {
+    height: 112px;
+    margin-bottom: 13px;
+    background: linear-gradient(135deg, #e7eef6, #cbd9e8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .rec-img svg {
+    width: 76px;
+    height: 76px;
+  }
+
+  .rec-product-name {
+    color: var(--ge-ink);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.25;
+    min-height: 42px;
+  }
+
+  .rec-product-model {
+    color: var(--ge-soft);
+    font-size: 9px;
+    margin-top: 4px;
+  }
+
+  .rec-metric-label,
+  .rec-metric-cell {
+    min-height: 54px;
+    border-top: 1px solid #e8e8e8;
+    display: flex;
+    align-items: center;
+  }
+
+  .rec-metric-label {
+    gap: 10px;
+    padding: 0 14px 0 20px;
+    font-size: 12px;
+    color: var(--ge-muted);
+  }
+
+  .rec-metric-label svg {
+    width: 22px;
+    height: 22px;
+    color: var(--ge-blue);
+    flex: 0 0 auto;
+  }
+
+  .rec-metric-label small {
+    color: var(--ge-soft);
+    font-size: 9px;
+  }
+
+  .rec-metric-cell {
+    justify-content: center;
+    border-left: 1px solid var(--ge-line);
+    color: var(--ge-muted);
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .rec-metric-cell.is-recommended {
+    border-left: 2px solid var(--ge-blue);
+    border-right: 2px solid var(--ge-blue);
+    background: var(--ge-blue-tint);
+    color: var(--ge-blue);
+  }
+
+  .rec-value {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-width: 0;
+  }
+
+  .rec-value svg {
+    width: 28px;
+    height: 28px;
+    color: var(--ge-blue);
+  }
+
+  .rec-money {
+    color: var(--ge-blue);
+    font-size: 26px;
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+
+  .rec-best-slot {
+    min-height: 42px;
+    border-left: 1px solid var(--ge-line);
+  }
+
+  .rec-best-slot.is-recommended {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--ge-blue);
+    border-top: 0;
+    border-radius: 0 0 9px 9px;
+    background: var(--ge-blue);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .rec-package-label,
+  .rec-package-slot {
+    min-height: 64px;
+    padding-top: 22px;
+  }
+
+  .rec-package-slot {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    border-left: 1px solid transparent;
+  }
+
+  .complete-package {
+    display: block;
+    margin: 0;
+    background: var(--ge-blue);
+    color: #fff;
+    border: 0;
+    min-width: 132px;
+    padding: 12px 18px;
+    font-size: 11px;
+    font-weight: 700;
+    transition: background .16s;
+  }
+
+  .complete-package:hover {
+    background: var(--ge-blue-dark);
+  }
+
+  .rec-footer-actions {
+    width: min(630px, calc(100vw - 40px));
+    margin: 34px auto 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+
+  .rec-action-btn {
+    min-height: 36px;
+    border: 1px solid var(--ge-line);
+    background: #fff;
+    color: var(--ge-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    transition: background .16s, border-color .16s, color .16s;
+  }
+
+  .rec-action-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .rec-action-btn:hover {
+    border-color: var(--ge-blue);
+    color: var(--ge-blue);
+    background: var(--ge-blue-tint);
+  }
+
+  .rec-action-btn.is-primary {
+    background: var(--ge-blue);
+    border-color: var(--ge-blue);
+    color: #fff;
+  }
+
+  .rec-action-btn.is-primary:hover {
+    background: var(--ge-blue-dark);
+    border-color: var(--ge-blue-dark);
+    color: #fff;
+  }
+
+  .rec-pro-btn {
+    width: min(630px, calc(100vw - 40px));
+    min-height: 50px;
+    margin: 14px auto 0;
+    border: 0;
+    background: var(--ge-blue);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    font-size: 18px;
+    font-weight: 700;
+    transition: background .16s;
+  }
+
+  .rec-pro-btn:hover {
+    background: var(--ge-blue-dark);
+  }
+
+  .rec-pro-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  @media (max-width: 720px) {
+    .page-header {
+      min-height: 142px;
+      border-width: 4px;
+      padding: 28px 18px;
+    }
+
+    .page-header h1 {
+      font-size: clamp(21px, 7vw, 28px);
+    }
+
+    #step-selection {
+      min-height: calc(100vh - 142px);
+    }
+
+    .solution-cards,
+    .opt-cards {
+      grid-template-columns: repeat(2, minmax(145px, 201px));
+      justify-content: center;
+      max-width: 417px;
+    }
+
+    .solution-card,
+    .opt-card,
+    .option-hint {
+      width: 100%;
+      max-width: 201px;
+      height: auto;
+      aspect-ratio: 1 / 1;
+    }
+
+    .dot-line {
+      width: 42px;
+    }
+
+    .rec-footer-actions {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .solution-cards,
+    .opt-cards {
+      grid-template-columns: minmax(145px, 201px);
+    }
+
+    .radio-row {
+      align-items: center;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .progress-dots {
+      transform: scale(.82);
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════ HEADER ══════════ -->
+<div class="page-header">
+  <h1>Product Selection Tool</h1>
+</div>
+
+<!-- ══════════════════════════════
+     STEP 1 – SOLUTION SELECTOR
+══════════════════════════════ -->
+<div id="step-selection">
+  <h2>What type of solution are you looking for?</h2>
+  <div class="solution-cards">
+
+    <!-- HVAC -->
+    <button class="solution-card" onclick="selectSolution('hvac')">
+      <svg width="92" height="92" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="1.4"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1v-9.5z"/>
+        <path d="M9 21V13h6v8"/>
+      </svg>
+      <span>HVAC</span>
+    </button>
+
+    <!-- Water Heating -->
+    <button class="solution-card" onclick="selectSolution('water-heating')">
+      <svg width="92" height="92" viewBox="0 0 64 64" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <rect x="18" y="8" width="28" height="48" rx="3"/>
+        <circle cx="32" cy="32" r="6"/>
+        <line x1="32" y1="20" x2="32" y2="26"/>
+        <line x1="32" y1="38" x2="32" y2="44"/>
+        <line x1="20" y1="32" x2="26" y2="32"/>
+        <line x1="38" y1="32" x2="44" y2="32"/>
+      </svg>
+      <span>Water<br>Heating</span>
+    </button>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     STEP 2 – QUESTIONNAIRE
+══════════════════════════════ -->
+<div id="step-questionnaire" class="hidden">
+  <button class="back-btn" onclick="handleBack()">&#8592; Back</button>
+  <div class="progress-dots" id="progress-dots"></div>
+  <div id="question-content"></div>
+</div>
+
+<!-- ══════════════════════════════
+     STEP 3 – RESULTS
+══════════════════════════════ -->
+<div id="step-results" class="hidden">
+  <button class="start-over" onclick="resetApp()">&#8592; Start Over</button>
+  <div class="res-header">
+    <h2 id="res-title">Your Recommended Products</h2>
+    <p>Based on your answers, we've selected the best products for your needs.</p>
+  </div>
+  <div class="products-grid" id="products-grid"></div>
+  <div class="help-box">
+    <h3>Need Help Deciding?</h3>
+    <p>Our experts are here to help you make the right choice.</p>
+    <div class="help-btns">
+      <button class="help-btn">Schedule Consultation</button>
+      <button class="help-btn">Download Buyer's Guide</button>
+      <button class="help-btn">Find a Dealer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ VENTS MODAL ══════════ -->
+<div id="vents-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <h3>Do you have existing ductwork / vents?</h3>
+    <p>This helps us find the right HVAC solution — central systems need ductwork while ductless mini-splits don't.</p>
+    <div class="modal-actions">
+      <button class="m-btn m-btn-primary"  onclick="handleVents(true)">Yes, I have vents</button>
+      <button class="m-btn m-btn-outline"  onclick="handleVents(false)">No vents</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ ZIP MODAL ══════════ -->
+<div id="zip-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <h3>What is your zip code?</h3>
+    
+    <input id="zip-input" class="zip-input" type="text" placeholder="e.g. 10001" maxlength="5"
+           oninput="this.value=this.value.replace(/\D/,'')" />
+    <div class="modal-actions">
+      <button class="m-btn m-btn-primary" onclick="handleZip()">Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════ -->
+<script>
+/* ─── State ─── */
+let S = {
+  step: 'selection',
+  solution: null,
+  answers: {},
+  qStep: 0,
+  radioAnswer: 'replacement'
+};
+
+/* ─── Products data ─── */
+const PRODUCTS = {
+  hvac: [
+    {
+      name: 'GE SmartClimate Pro', model: 'ASHX24SGCWF',
+      price: '$4,299', rating: 4.8, reviews: 342,
+      badge: 'Best Match', efficiency: 'SEER 24.5',
+      desc: 'High-efficiency heat pump with smart home integration and ultra-quiet operation.',
+      features: ['Energy Star certified','Wi-Fi enabled smart control','Variable-speed compressor','Noise level: 58 dB','Compatible with all smart home systems'],
+      specs: 'Cooling capacity: 24,000 BTU. SEER2: 21.5. HSPF2: 10.0.',
+      warranty: '10-year parts & compressor warranty when registered.'
+    },
+    {
+      name: 'GE Climate Elite', model: 'AHHX18DGCEF',
+      price: '$3,599', rating: 4.6, reviews: 287,
+      efficiency: 'SEER 20',
+      desc: 'Reliable central air conditioning system with excellent energy efficiency.',
+      features: ['Energy Star certified','Two-stage cooling','Quiet operation','10-year warranty','Advanced filtration system'],
+      specs: 'Cooling capacity: 18,000 BTU. Two-stage compressor. Sound: 62 dB.',
+      warranty: '10-year limited warranty on all parts.'
+    },
+    {
+      name: 'GE Ductless MiniMax', model: 'DLMX12HSWF',
+      price: '$2,899', rating: 4.7, reviews: 198,
+      efficiency: 'SEER 22',
+      desc: 'Compact ductless mini-split perfect for zone heating and cooling — no ductwork needed.',
+      features: ['Multi-zone capability','Whisper-quiet indoor unit','Sleek wall-mounted design','Remote control included','Easy installation'],
+      specs: 'Cooling capacity: 12,000 BTU. Heating: 13,600 BTU. Indoor noise: 25 dB.',
+      warranty: '7-year parts & 5-year compressor warranty.'
+    },
+    {
+      name: 'GE Zoneline Ultimate', model: 'AZ65E12EAC',
+      price: '$3,199', rating: 4.9, reviews: 154,
+      efficiency: 'EER 13.0',
+      desc: 'Premium packaged terminal system with excellent comfort control and commercial-grade durability.',
+      features: ['Highest efficiency option','Makeup air ready','Quiet fan profile','Advanced diagnostics','Premium warranty'],
+      specs: 'Cooling capacity: 12,000 BTU. Heat pump with electric backup. Sound: 55 dB.',
+      warranty: '10-year sealed system warranty.'
+    }
+  ],
+  'water-heating': [
+    {
+      name: 'GE UltraFlow Tankless', model: 'GTH240ENBSR',
+      price: '$1,899', rating: 4.9, reviews: 521,
+      badge: 'Best Match', efficiency: '0.96 UEF',
+      desc: 'High-efficiency tankless water heater providing endless hot water on demand.',
+      features: ['Endless hot water supply','96% energy efficient','Space-saving design','Digital temperature control','12-year warranty'],
+      specs: 'Flow rate: 9.5 GPM. Min activation: 0.26 GPM. Gas type: Natural Gas / Propane.',
+      warranty: '12-year limited warranty on heat exchanger.'
+    },
+    {
+      name: 'GE HeatPump ProMax', model: 'GHPH50DFEJSR',
+      price: '$2,299', rating: 4.7, reviews: 389,
+      efficiency: '3.75 UEF',
+      desc: 'Energy-saving heat pump water heater with 50-gallon capacity.',
+      features: ['Up to 70% energy savings','50-gallon capacity','Hybrid operation modes','Leak detection system','Quiet operation'],
+      specs: 'Capacity: 50 gal. First-hour delivery: 63 gal. Voltage: 240V / 30A.',
+      warranty: '10-year limited tank & parts warranty.'
+    },
+    {
+      name: 'GE PowerFlow Electric', model: 'GE50T06AAG',
+      price: '$899', rating: 4.5, reviews: 612,
+      efficiency: '0.92 UEF',
+      desc: 'Reliable electric water heater with excellent insulation and durability.',
+      features: ['50-gallon capacity','Self-cleaning feature','Durable glass-lined tank','6-year warranty','Easy maintenance'],
+      specs: 'Capacity: 50 gal. Wattage: 4,500W. Recovery: 21 GPH at 90°F rise.',
+      warranty: '6-year limited tank & parts warranty.'
+    },
+    {
+      name: 'GE SmartShield Hybrid', model: 'GHPH80DFEJSR',
+      price: '$2,699', rating: 4.8, reviews: 246,
+      efficiency: '4.0 UEF',
+      desc: 'High-capacity hybrid water heater for larger households and maximum energy savings.',
+      features: ['80-gallon capacity','Hybrid heat pump operation','Leak protection','Smart app monitoring','Vacation mode'],
+      specs: 'Capacity: 80 gal. Voltage: 240V / 30A. First-hour delivery: 86 gal.',
+      warranty: '10-year limited tank & parts warranty.'
+    }
+  ]
+};
+
+/* ─── Question definitions ─── */
+const QUESTIONS = {
+  hvac: [
+    {
+      id: 'priority',
+      q: 'What matters most to you?',
+      type: 'cards',
+      opts: [
+        { val: 'efficiency', lbl: 'Energy<br>Efficiency', icon: 'energy-home' },
+        { val: 'savings',    lbl: 'Energy Savings',       sub: '(SEER2/HSPF2)',       icon: 'energy-savings' },
+        { val: 'quiet',      lbl: 'Quiet<br>Operation',   sub: '(Sound Level DBA)',   icon: 'quiet' },
+        { val: 'cost',       lbl: 'System<br>Purchase Cost', icon: 'purchase-cost' },
+        { val: 'comfort',    lbl: 'Precise<br>Comfort',   icon: 'comfort' }
+      ]
+    },
+    {
+      id: 'fuelType',
+      q: 'What fuel type does your current or planned system use?',
+      type: 'cards-radio',
+      radio: [
+        { val: 'replacement', lbl: 'Replacement System' },
+        { val: 'new', lbl: 'New Installation' }
+      ],
+      opts: [
+        { val: 'gas',       lbl: 'Gas',       icon: 'flame'     },
+        { val: 'electric',  lbl: 'Electric',  icon: 'bolt'      },
+        { val: 'heat-pump', lbl: 'Heat Pump', icon: 'heat-pump' }
+      ]
+    },
+    {
+      id: 'squareFootage',
+      q: 'What is the square footage of your home?',
+      type: 'sqft'
+    },
+    {
+      id: 'roomSolution',
+      q: 'Which room coverage do you need?',
+      type: 'cards',
+      opts: [
+        { val: 'single', lbl: 'Single Room', icon: 'room'  },
+        { val: 'multi',  lbl: 'Multi Room',  icon: 'rooms' },
+        { val: 'whole',  lbl: 'Whole Home',  icon: 'house' }
+      ]
+    }
+  ],
+  'water-heating': [
+    {
+      id: 'fuelSource',
+      q: 'What fuel source do you prefer?',
+      type: 'cards',
+      opts: [
+        { val: 'gas',       lbl: 'Gas',       icon: 'flame'     },
+        { val: 'electric',  lbl: 'Electric',  icon: 'bolt'      },
+        { val: 'heat-pump', lbl: 'Heat Pump', icon: 'heat-pump' }
+      ]
+    },
+    { id: 'gasDetails',      q: 'Tell us about your gas water heater needs',       type: 'gasForm'  },
+    { id: 'electricDetails', q: 'Tell us about your electric water heater needs',  type: 'elecForm' },
+    { id: 'heatPumpDetails', q: 'Tell us about your heat pump water heater needs', type: 'hpForm'   }
+  ]
+};
+
+/* ─────────────────────────────────────
+   NAVIGATION
+───────────────────────────────────── */
+function showPage(id) {
+  ['step-selection','step-questionnaire','step-results'].forEach(s =>
+    document.getElementById(s).classList.add('hidden')
+  );
+  document.getElementById(id).classList.remove('hidden');
+}
+
+function selectSolution(type) {
+  S = { step:'questionnaire', solution:type, answers:{}, qStep:0, radioAnswer:'replacement' };
+  showPage('step-questionnaire');
+  render();
+}
+
+function handleBack() {
+  if (S.solution === 'hvac' && S.qStep === 3 && S.answers.hasVents === 'false') {
+    S.qStep = 1;
+    render();
+    return;
+  }
+
+  if (S.qStep > 0) {
+    S.qStep--;
+    render();
+  } else {
+    resetApp();
+  }
+}
+
+function resetApp() {
+  S = { step:'selection', solution:null, answers:{}, qStep:0, radioAnswer:'replacement' };
+  ['vents-modal','zip-modal'].forEach(id => document.getElementById(id).classList.add('hidden'));
+  showPage('step-selection');
+}
+
+/* ─────────────────────────────────────
+   RENDER QUESTIONNAIRE
+───────────────────────────────────── */
+function render() {
+  const qs = QUESTIONS[S.solution];
+  renderDots(visualStepCount(), S.qStep);
+  const q  = qs[S.qStep];
+  const ct = document.getElementById('question-content');
+  ct.innerHTML = '';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'q-wrap';
+
+  const title = document.createElement('h2');
+  title.className = 'q-title';
+  title.textContent = q.q;
+  wrap.appendChild(title);
+
+  if      (q.type === 'cards-radio') buildCardsRadio(wrap, q);
+  else if (q.type === 'cards')       buildCards(wrap, q);
+  else if (q.type === 'sqft')        buildSqft(wrap);
+  else if (q.type === 'gasForm')     buildGasForm(wrap);
+  else if (q.type === 'elecForm')    buildElecForm(wrap);
+  else if (q.type === 'hpForm')      buildHpForm(wrap);
+
+  ct.appendChild(wrap);
+}
+
+function visualStepCount() {
+  return S.solution === 'hvac' ? 7 : QUESTIONS[S.solution].length;
+}
+
+function renderDots(total, current) {
+  const c = document.getElementById('progress-dots');
+  c.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === current ? ' active' : i < current ? ' done' : '');
+    c.appendChild(d);
+    if (i < total - 1) {
+      const l = document.createElement('div');
+      l.className = 'dot-line';
+      c.appendChild(l);
+    }
+  }
+}
+
+/* ─── Cards + radio (HVAC fuel type) ─── */
+function buildCardsRadio(wrap, q) {
+  // Radio row
+  const row = document.createElement('div');
+  row.className = 'radio-row';
+  q.radio.forEach(r => {
+    const lbl = document.createElement('label');
+    lbl.innerHTML = `
+      <input type="radio" name="sysType" value="${r.val}"
+        ${S.radioAnswer === r.val ? 'checked' : ''}
+        onchange="S.radioAnswer = this.value" />
+      ${r.lbl}`;
+    row.appendChild(lbl);
+  });
+  wrap.appendChild(row);
+
+  // Opt cards
+  const cards = document.createElement('div');
+  cards.className = 'opt-cards';
+  q.opts.forEach(o => {
+    const card = document.createElement('div');
+    card.className = 'opt-card' + (S.answers[q.id] === o.val ? ' selected' : '');
+    card.innerHTML = svgIcon(o.icon, 58) + `<span>${o.lbl}</span>${o.sub ? `<small>${o.sub}</small>` : ''}`;
+    card.onclick = () => {
+      S.answers[q.id] = o.val;
+      wrap.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      setTimeout(() => {
+        if (S.radioAnswer === 'replacement') {
+          document.getElementById('vents-modal').classList.remove('hidden');
+        } else {
+          S.qStep = 2; render();
+        }
+      }, 280);
+    };
+    cards.appendChild(card);
+  });
+  wrap.appendChild(cards);
+}
+
+/* ─── Plain cards ─── */
+function buildCards(wrap, q) {
+  const cards = document.createElement('div');
+  cards.className = 'opt-cards';
+  q.opts.forEach(o => {
+    const card = document.createElement('div');
+    card.className = 'opt-card' + (S.answers[q.id] === o.val ? ' selected' : '');
+    card.innerHTML = svgIcon(o.icon, 58) + `<span>${o.lbl}</span>${o.sub ? `<small>${o.sub}</small>` : ''}`;
+    card.onclick = () => {
+      S.answers[q.id] = o.val;
+      wrap.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+
+      // Water-heating fuel routing
+      if (q.id === 'fuelSource') {
+        setTimeout(() => {
+          if      (o.val === 'gas')       S.qStep = 1;
+          else if (o.val === 'electric')  S.qStep = 2;
+          else if (o.val === 'heat-pump') S.qStep = 3;
+          render();
+        }, 280);
+        return;
+      }
+
+      // HVAC room solution → results
+      setTimeout(() => {
+        const qs = QUESTIONS[S.solution];
+        if (S.qStep < qs.length - 1) { S.qStep++; render(); }
+        else showResults();
+      }, 280);
+    };
+    cards.appendChild(card);
+  });
+
+  if (q.opts.length === 5) {
+    const hint = document.createElement('div');
+    hint.className = 'option-hint';
+    hint.innerHTML = '<div class="hint-arrow">&#8592;</div><span>Select an<br>option</span>';
+    cards.appendChild(hint);
+  }
+
+  wrap.appendChild(cards);
+}
+
+/* ─── Square footage ─── */
+function buildSqft(wrap) {
+  const div = document.createElement('div');
+  div.className = 'sqft-wrap';
+  div.innerHTML = `
+    <input class="sqft-input" id="sqft-in" type="number"
+           placeholder="1500" value="${S.answers.squareFootage || ''}" />
+    <div class="sqft-unit">square feet</div>
+    <button class="next-btn" onclick="handleSqft()">Next</button>`;
+  wrap.appendChild(div);
+}
+function handleSqft() {
+  const v = document.getElementById('sqft-in').value;
+  if (!v) return;
+  S.answers.squareFootage = v;
+  document.getElementById('zip-modal').classList.remove('hidden');
+}
+function handleZip() {
+  const v = document.getElementById('zip-input').value;
+  if (!v) return;
+  S.answers.zipCode = v;
+  document.getElementById('zip-modal').classList.add('hidden');
+  showResults();
+}
+
+/* ─── Vents modal response ─── */
+function handleVents(hasVents) {
+  document.getElementById('vents-modal').classList.add('hidden');
+  S.answers.hasVents = String(hasVents);
+  S.qStep = hasVents ? 2 : 3;  // sq-footage or room-solution
+  render();
+}
+
+/* ─── Gas form ─── */
+function buildGasForm(wrap) {
+  const f = document.createElement('div');
+  f.innerHTML = `
+    <div class="form-grid-3">
+      <div class="form-group">
+        <label>Style</label>
+        <select id="gStyle">
+          <option value="standard">Standard</option>
+          <option value="tall">Tall Boy</option>
+          <option value="lowboy">Low Boy</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Vent Type</label>
+        <select id="gVent">
+          <option value="Power Vent">Power Vent</option>
+          <option value="Direct Vent">Direct Vent</option>
+          <option value="Atmospheric">Atmospheric</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Burner Type</label>
+        <select id="gBurner">
+          <option value="">Select…</option>
+          <option value="standard">Standard</option>
+          <option value="condensing">Condensing</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Capacity (bathrooms)</label>
+        <select id="gCap">
+          <option value="">Select…</option>
+          <option value="1">1 bathroom</option>
+          <option value="2">2 bathrooms</option>
+          <option value="3">3 bathrooms</option>
+          <option value="4">4+ bathrooms</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Height Available</label>
+        <select id="gH">
+          <option value="">Select…</option>
+          <option value='standard'>Standard (60")</option>
+          <option value='tall'>Tall (70"+)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Fuel Type</label>
+        <select id="gFuel">
+          <option value="">Select…</option>
+          <option value="natural-gas">Natural Gas</option>
+          <option value="propane">Propane</option>
+        </select>
+      </div>
+    </div>
+    <button class="next-btn" onclick="submitGas()">Next</button>`;
+  wrap.appendChild(f);
+}
+function submitGas() {
+  S.answers.gasStyle   = val('gStyle');
+  S.answers.ventType   = val('gVent');
+  S.answers.burnerType = val('gBurner');
+  S.answers.capacity   = val('gCap');
+  S.answers.height     = val('gH');
+  S.answers.fuelType   = val('gFuel');
+  showResults();
+}
+
+/* ─── Electric form ─── */
+function buildElecForm(wrap) {
+  const f = document.createElement('div');
+  f.innerHTML = `
+    <div class="form-grid-3">
+      <div class="form-group">
+        <label>Type</label>
+        <select id="eType">
+          <option value="">Select…</option>
+          <option value="standard">Standard Tank</option>
+          <option value="marathon">Marathon</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Base Configuration</label>
+        <select id="eBase">
+          <option value="Standard Electronic (Built-In)">Standard Electronic (Built-In)</option>
+          <option value="Smart Module">Smart Module</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Amperage Available</label>
+        <select id="eAmp">
+          <option value="">Select…</option>
+          <option value="30">30 Amp</option>
+          <option value="40">40 Amp</option>
+          <option value="50">50 Amp</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label>Capacity (bathrooms)</label>
+        <select id="eCap">
+          <option value="">Select…</option>
+          <option value="1">1 bathroom</option>
+          <option value="2">2 bathrooms</option>
+          <option value="3">3 bathrooms</option>
+          <option value="4">4+ bathrooms</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Height</label>
+        <select id="eH">
+          <option value='Short, 40-55"'>Short, 40–55"</option>
+          <option value='Tall, 60"+'>Tall, 60"+</option>
+        </select>
+      </div>
+    </div>
+    <button class="next-btn" onclick="submitElec()">Next</button>`;
+  wrap.appendChild(f);
+}
+function submitElec() {
+  S.answers.electricType   = val('eType');
+  S.answers.baseConfig     = val('eBase');
+  S.answers.amperage       = val('eAmp');
+  S.answers.capacity       = val('eCap');
+  S.answers.height         = val('eH');
+  showResults();
+}
+
+/* ─── Heat pump form ─── */
+function buildHpForm(wrap) {
+  const f = document.createElement('div');
+  f.innerHTML = `
+    <div class="form-grid-3">
+      <div class="form-group">
+        <label>Capacity (bathrooms)</label>
+        <select id="hpCap">
+          <option value="">Select…</option>
+          <option value="1">1 bathroom</option>
+          <option value="2">2 bathrooms</option>
+          <option value="3">3 bathrooms</option>
+          <option value="4">4+ bathrooms</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Power Supply</label>
+        <select id="hpPow">
+          <option value="">Select…</option>
+          <option value="120v">120 V</option>
+          <option value="240v">240 V</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Amperage</label>
+        <select id="hpAmp">
+          <option value="">Select…</option>
+          <option value="15">15 Amp</option>
+          <option value="20">20 Amp</option>
+          <option value="30">30 Amp</option>
+        </select>
+      </div>
+    </div>
+    <button class="next-btn" onclick="submitHp()">Next</button>`;
+  wrap.appendChild(f);
+}
+function submitHp() {
+  S.answers.capacity    = val('hpCap');
+  S.answers.powerSupply = val('hpPow');
+  S.answers.amperage    = val('hpAmp');
+  showResults();
+}
+
+/* ─────────────────────────────────────
+   RESULTS
+───────────────────────────────────── */
+const TITLES = { hvac:'HVAC Systems', 'water-heating':'Water Heating Solutions' };
+
+function showResults() {
+  S.step = 'results';
+  document.getElementById('res-title').textContent = 'Recommended Products';
+  showPage('step-results');
+
+  const grid = document.getElementById('products-grid');
+  grid.innerHTML = '';
+  grid.appendChild(buildRecommendationMatrix(PRODUCTS[S.solution]));
+}
+
+function buildRecommendationMatrix(products) {
+  const selectedIndex = Math.min(2, products.length - 1);
+  const priority = getPriorityMeta();
+  const metrics = getRecommendationMetrics();
+  const matrix = document.createElement('div');
+  matrix.className = 'rec-matrix';
+  matrix.style.setProperty('--product-count', products.length);
+
+  const productHeads = products.map((p, i) => `
+    <div class="rec-product-head ${i === selectedIndex ? 'is-recommended' : ''}">
+      <div class="rec-img">${productSvg(p.name)}</div>
+      <div class="rec-product-name">${p.name}</div>
+      <div class="rec-product-model">${p.model}</div>
+    </div>
+  `).join('');
+
+  const metricRows = metrics.map(metric => `
+    <div class="rec-metric-label">
+      ${svgIcon(metric.icon, 22)}
+      <span>${metric.label}${metric.note ? `<small> ${metric.note}</small>` : ''}</span>
+    </div>
+    ${products.map((_, i) => `
+      <div class="rec-metric-cell ${i === selectedIndex ? 'is-recommended' : ''}">
+        ${metricValueMarkup(metric, i)}
+      </div>
+    `).join('')}
+  `).join('');
+
+  const bestRow = `
+    <div class="rec-best-label"></div>
+    ${products.map((_, i) => `
+      <div class="rec-best-slot ${i === selectedIndex ? 'is-recommended' : ''}">
+        ${i === selectedIndex ? 'Best Option' : ''}
+      </div>
+    `).join('')}
+  `;
+
+  const packageRow = `
+    <div class="rec-package-label"></div>
+    ${products.map((_, i) => `
+      <div class="rec-package-slot">
+        ${i === selectedIndex ? '<button class="complete-package">Complete package</button>' : ''}
+      </div>
+    `).join('')}
+  `;
+
+  matrix.innerHTML = `
+    <div class="rec-grid">
+      <div class="rec-priority-card">
+        <div class="rec-priority-main">
+          ${svgIcon(priority.icon, 34)}
+          <div class="rec-priority-label">${priority.label}</div>
+        </div>
+        <div class="rec-priority-edit">
+          ${svgIcon('edit', 30)}
+          <button class="rec-update-btn" onclick="editPriority()">Priority<br>Update</button>
+        </div>
+      </div>
+      ${productHeads}
+      ${metricRows}
+      ${bestRow}
+      ${packageRow}
+    </div>
+    <div class="rec-footer-actions">
+      <button class="rec-action-btn" onclick="printComparison()">Print ${svgIcon('printer', 14)}</button>
+      <button class="rec-action-btn is-primary" onclick="downloadComparison()">Download Comparison ${svgIcon('download', 14)}</button>
+      <button class="rec-action-btn is-primary" onclick="sendByEmail()">SEND BY EMAIL</button>
+    </div>
+    <button class="rec-pro-btn">${getProLabel()} ${svgIcon('wrench', 18)}</button>
+  `;
+
+  return matrix;
+}
+
+function getPriorityMeta() {
+  const map = {
+    efficiency: { label: 'Energy<br>Efficiency', icon: 'energy-home' },
+    savings: { label: 'Energy<br>Savings', icon: 'energy-savings' },
+    quiet: { label: 'Quiet<br>Operation', icon: 'quiet' },
+    cost: { label: 'Purchase<br>Cost', icon: 'purchase-cost' },
+    comfort: { label: 'Precise<br>Comfort', icon: 'comfort' }
+  };
+
+  if (S.solution === 'hvac' && S.answers.priority && map[S.answers.priority]) {
+    return map[S.answers.priority];
+  }
+
+  return { label: 'Best<br>Match', icon: S.solution === 'water-heating' ? 'heat-pump' : 'energy-savings' };
+}
+
+function getRecommendationMetrics() {
+  return [
+    { key: 'efficiency', label: 'Energy Efficiency', icon: 'energy-home', values: ['Standard', 'Medium', 'High', 'Highest'] },
+    { key: 'savings', label: 'Energy Savings', icon: 'energy-savings', values: ['Standard', 'Medium', 'High', 'Highest'] },
+    { key: 'quiet', label: 'Quiet Operation', note: '(Sound Power DBA)', icon: 'quiet', values: ['Standard', 'Medium', 'High', 'Highest'] },
+    { key: 'cost', label: 'System Purchase Cost', note: '(MSRP)', icon: 'purchase-cost', values: ['$', '$$', '$$$', '$$$$'] },
+    { key: 'comfort', label: 'Precise Comfort', icon: 'comfort', values: ['Good', 'Better', 'Best', 'Ultimate'] }
+  ];
+}
+
+function metricValueMarkup(metric, index) {
+  const value = metric.values[Math.min(index, metric.values.length - 1)];
+
+  if (metric.key === 'cost') {
+    return `<span class="rec-money">${value}</span>`;
+  }
+
+  return `<span class="rec-value">${svgIcon(metric.icon, 28)}<span>${value}</span></span>`;
+}
+
+function editPriority() {
+  if (S.solution === 'hvac') {
+    S.step = 'questionnaire';
+    S.qStep = 0;
+    showPage('step-questionnaire');
+    render();
+    return;
+  }
+
+  resetApp();
+}
+
+function getProLabel() {
+  return S.solution === 'water-heating' ? 'Connect with a Water Heating Pro' : 'Connect with a HVAC Pro';
+}
+
+function comparisonSummary() {
+  const products = PRODUCTS[S.solution] || [];
+  const metrics = getRecommendationMetrics();
+  const lines = [
+    'GE Appliances Product Recommendation',
+    '',
+    'Products:',
+    ...products.map((p, i) => `${i + 1}. ${p.name} (${p.model})`)
+  ];
+
+  lines.push('', 'Comparison:');
+  metrics.forEach(metric => {
+    const values = products.map((p, i) => {
+      const value = metric.values[Math.min(i, metric.values.length - 1)];
+      return `${p.model}: ${value}`;
+    }).join(' | ');
+    lines.push(`${metric.label}: ${values}`);
+  });
+
+  return lines.join('\n');
+}
+
+function printComparison() {
+  window.print();
+}
+
+function downloadComparison() {
+  const blob = new Blob([comparisonSummary()], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ge-appliances-product-comparison.txt';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function sendByEmail() {
+  const subject = encodeURIComponent('GE Appliances product comparison');
+  const body = encodeURIComponent(comparisonSummary());
+  window.location.href = `mailto:?subject=${subject}&body=${body}`;
+}
+
+function buildProductCard(p) {
+  const card = document.createElement('div');
+  card.className = 'prod-card';
+
+  // Stars
+  const stars = Array.from({length:5}, (_,i) =>
+    `<span class="star ${i < Math.floor(p.rating) ? 'on' : ''}">&#9733;</span>`
+  ).join('');
+
+  // Features
+  const feats = p.features.map(f =>
+    `<div class="feat-item"><span class="feat-check">&#10003;</span>${f}</div>`
+  ).join('');
+
+  card.innerHTML = `
+    ${p.badge ? `<div class="prod-badge">${p.badge}</div>` : ''}
+    <div class="prod-img">${productSvg(p.name)}</div>
+    <div class="prod-body">
+      <div class="prod-top">
+        <div>
+          <div class="prod-name">${p.name}</div>
+          <div class="prod-model">${p.model}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="prod-price">${p.price}</div>
+          ${p.efficiency ? `<div class="eff-badge">${p.efficiency}</div>` : ''}
+        </div>
+      </div>
+      <div class="stars">${stars}
+        <span class="rating-text">${p.rating} (${p.reviews} reviews)</span>
+      </div>
+      <div class="prod-desc">${p.desc}</div>
+      <div>${feats}</div>
+
+      <div class="acc">
+        <div class="acc-item">
+          <div class="acc-hdr" onclick="toggleAcc(this)">
+            Additional Specs <span class="acc-arrow">&#9660;</span>
+          </div>
+          <div class="acc-body">${p.specs}</div>
+        </div>
+        <div class="acc-item">
+          <div class="acc-hdr" onclick="toggleAcc(this)">
+            Warranty Info <span class="acc-arrow">&#9660;</span>
+          </div>
+          <div class="acc-body">${p.warranty}</div>
+        </div>
+      </div>
+
+      <div class="prod-actions">
+        <button class="btn-view">View Details</button>
+        <button class="btn-cmp">Compare Products</button>
+      </div>
+    </div>`;
+  return card;
+}
+
+function toggleAcc(hdr) {
+  hdr.parentElement.classList.toggle('open');
+}
+
+/* ─────────────────────────────────────
+   SVG ICONS
+───────────────────────────────────── */
+function svgIcon(type, size) {
+  const s = size || 48;
+  const icons = {
+    printer: `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 24V10h28v14"/>
+      <path d="M18 46H12a4 4 0 01-4-4V28a4 4 0 014-4h40a4 4 0 014 4v14a4 4 0 01-4 4h-6"/>
+      <path d="M20 38h24v16H20z"/>
+      <path d="M46 32h4"/>
+    </svg>`,
+    download: `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M32 10v30"/>
+      <path d="M20 28l12 12 12-12"/>
+      <path d="M16 50h32"/>
+    </svg>`,
+    wrench: `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M42 10a14 14 0 00-18 17L11 40a7 7 0 1010 10l13-13a14 14 0 0017-18l-9 9-7-7z"/>
+    </svg>`,
+    edit: `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M39 12l13 13"/>
+      <path d="M17 47l4-14 25-25 10 10-25 25-14 4z"/>
+      <path d="M14 52h36"/>
+    </svg>`,
+    'energy-home': `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M13 30L32 16l19 14"/>
+      <path d="M18 29v22h28V29"/>
+      <rect x="26" y="34" width="12" height="14" rx="2"/>
+      <path d="M30 34v-5h4v5"/>
+      <path d="M29 48v4"/>
+      <path d="M35 48v4"/>
+      <path d="M25 41h14"/>
+    </svg>`,
+    'energy-savings': `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="32" cy="28" r="20"/>
+      <path d="M28 44c-2-12-9-16-10-26 10 1 20 8 21 21"/>
+      <path d="M25 25c5 5 9 12 11 21"/>
+      <path d="M21 51l-5-5"/>
+      <path d="M17 45l-3 3 6 6 3-3"/>
+    </svg>`,
+    quiet: `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17 27h10l13-10v30L27 37H17z"/>
+      <path d="M47 26c2 2 3 4 3 6s-1 4-3 6"/>
+      <path d="M54 24v16"/>
+      <path d="M54 40l-4-4"/>
+      <path d="M54 40l4-4"/>
+    </svg>`,
+    'purchase-cost': `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="9" y="22" width="33" height="21" rx="2"/>
+      <path d="M9 28h33"/>
+      <path d="M17 36h4"/>
+      <path d="M32 25l15-5 8 24-20 7"/>
+      <circle cx="46" cy="38" r="8"/>
+      <path d="M46 33v10"/>
+      <path d="M42 36c0-2 2-3 4-3s4 1 4 3c0 4-8 1-8 5 0 2 2 3 4 3s4-1 4-3"/>
+    </svg>`,
+    comfort: `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="38" cy="19" r="5"/>
+      <path d="M27 34l5-9c2-4 8-3 9 1l3 9"/>
+      <path d="M17 43h25c7 0 11-6 12-12"/>
+      <path d="M15 43l-4 9"/>
+      <path d="M42 43l-4 9"/>
+      <path d="M23 34h18"/>
+    </svg>`,
+    flame: `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2c-1 3.5.5 6.5-2 9 0-2-1.5-3.5-1.5-5.5C6 8 5 11 5 13a7 7 0 0014 0c0-4-3-8-7-11z"/>
+    </svg>`,
+    bolt: `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+    </svg>`,
+    'heat-pump': `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <rect x="12" y="22" width="40" height="20" rx="3"/>
+      <circle cx="26" cy="32" r="5"/>
+      <line x1="31" y1="32" x2="44" y2="32"/>
+      <line x1="44" y1="27" x2="44" y2="37"/>
+    </svg>`,
+    house: `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1v-9.5z"/>
+      <path d="M9 21V13h6v8"/>
+    </svg>`,
+    room: `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <rect x="3" y="3" width="18" height="18" rx="2"/>
+      <line x1="3" y1="9" x2="21" y2="9"/>
+    </svg>`,
+    rooms: `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <rect x="2" y="2" width="9" height="9" rx="1"/>
+      <rect x="13" y="2" width="9" height="9" rx="1"/>
+      <rect x="2" y="13" width="9" height="9" rx="1"/>
+      <rect x="13" y="13" width="9" height="9" rx="1"/>
+    </svg>`
+  };
+  return icons[type] || '';
+}
+
+function productSvg(name) {
+  if (name.includes('Tankless'))
+    return `<svg width="80" height="80" viewBox="0 0 64 64" fill="none" stroke="#1f4578" stroke-width="1.8" stroke-linecap="round" opacity=".55">
+      <rect x="22" y="6" width="20" height="52" rx="3"/>
+      <line x1="26" y1="18" x2="38" y2="18"/>
+      <line x1="26" y1="26" x2="38" y2="26"/>
+      <line x1="26" y1="34" x2="38" y2="34"/>
+      <line x1="22" y1="10" x2="16" y2="10"/>
+      <line x1="22" y1="54" x2="16" y2="54"/>
+    </svg>`;
+  if (name.includes('HeatPump') || name.includes('Heat Pump'))
+    return `<svg width="80" height="80" viewBox="0 0 64 64" fill="none" stroke="#1f4578" stroke-width="1.8" stroke-linecap="round" opacity=".55">
+      <rect x="10" y="20" width="44" height="24" rx="3"/>
+      <circle cx="24" cy="32" r="6"/>
+      <line x1="30" y1="32" x2="44" y2="32"/>
+      <line x1="44" y1="27" x2="44" y2="37"/>
+    </svg>`;
+  if (name.includes('Zoneline'))
+    return `<svg width="80" height="80" viewBox="0 0 64 64" fill="none" stroke="#1f4578" stroke-width="1.8" stroke-linecap="round" opacity=".55">
+      <rect x="10" y="18" width="44" height="28" rx="3"/>
+      <line x1="16" y1="26" x2="48" y2="26"/>
+      <line x1="16" y1="32" x2="48" y2="32"/>
+      <circle cx="22" cy="39" r="3"/>
+      <circle cx="42" cy="39" r="3"/>
+      <line x1="18" y1="46" x2="18" y2="54"/>
+      <line x1="46" y1="46" x2="46" y2="54"/>
+    </svg>`;
+  if (name.includes('SmartClimate') || name.includes('Climate Elite'))
+    return `<svg width="80" height="80" viewBox="0 0 64 64" fill="none" stroke="#1f4578" stroke-width="1.8" stroke-linecap="round" opacity=".55">
+      <rect x="6" y="22" width="52" height="20" rx="3"/>
+      <circle cx="20" cy="32" r="5"/>
+      <line x1="28" y1="28" x2="50" y2="28"/>
+      <line x1="28" y1="32" x2="50" y2="32"/>
+      <line x1="28" y1="36" x2="50" y2="36"/>
+      <line x1="14" y1="42" x2="14" y2="50"/>
+      <line x1="50" y1="42" x2="50" y2="50"/>
+    </svg>`;
+  if (name.includes('Ductless') || name.includes('MiniMax'))
+    return `<svg width="80" height="80" viewBox="0 0 64 64" fill="none" stroke="#1f4578" stroke-width="1.8" stroke-linecap="round" opacity=".55">
+      <rect x="8" y="18" width="48" height="14" rx="3"/>
+      <line x1="14" y1="25" x2="50" y2="25"/>
+      <line x1="14" y1="32" x2="18" y2="48"/>
+      <line x1="50" y1="32" x2="46" y2="48"/>
+      <line x1="18" y1="48" x2="46" y2="48"/>
+    </svg>`;
+  // Default – electric tank
+  return `<svg width="80" height="80" viewBox="0 0 64 64" fill="none" stroke="#1f4578" stroke-width="1.8" stroke-linecap="round" opacity=".55">
+    <rect x="18" y="6" width="28" height="52" rx="3"/>
+    <circle cx="32" cy="32" r="7"/>
+    <line x1="32" y1="25" x2="32" y2="18"/>
+    <line x1="32" y1="46" x2="32" y2="39"/>
+    <line x1="25" y1="32" x2="18" y2="32"/>
+    <line x1="46" y1="32" x2="39" y2="32"/>
+  </svg>`;
+}
+
+/* ─── Utility ─── */
+function val(id) {
+  const el = document.getElementById(id);
+  return el ? el.value : '';
+}
+</script>
+</body>
+</html>
