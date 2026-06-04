@@ -551,6 +551,13 @@
     max-width: 633px;
   }
 
+  .vents-cards {
+    grid-template-columns: repeat(2, 201px);
+    justify-content: center;
+    max-width: 417px;
+    margin: 0 auto;
+  }
+
   .solution-card,
   .opt-card {
     width: 201px;
@@ -1699,11 +1706,11 @@ function buildMultiCards(wrap, q) {
 /* HVAC vents page */
 function buildVentsPage(wrap, q) {
   const cards = document.createElement('div');
-  cards.className = 'opt-cards';
+  cards.className = 'opt-cards vents-cards';
   q.opts.forEach(o => {
     const card = document.createElement('div');
     card.className = 'opt-card' + (S.answers[q.id] === o.val ? ' selected' : '');
-    card.innerHTML = svgIcon(o.icon, 58) + `<span>${o.lbl}</span>`;
+    card.innerHTML = `<span>${o.lbl}</span>`;
     card.onclick = () => {
       S.answers[q.id] = o.val;
       wrap.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
