@@ -1455,6 +1455,7 @@ const QUESTIONS = {
       id: 'priority',
       q: 'What matters most to you?',
       type: 'cards',
+      maxSelections: 2,
       opts: [
         { val: 'efficiency', lbl: 'Energy<br>Efficiency', icon: 'energy-home' },
         { val: 'savings',    lbl: 'Energy Savings',       sub: '(SEER2/HSPF2)',       icon: 'energy-savings' },
@@ -1475,6 +1476,15 @@ const QUESTIONS = {
         { val: 'gas-propane', lbl: 'Gas / Propane', icon: 'gas-propane' },
         { val: 'electric',    lbl: 'Electric',      icon: 'bolt'        },
         { val: 'oil',         lbl: 'Oil',           icon: 'oil'         }
+      ]
+    },
+    {
+      id: 'hasVents',
+      q: 'Does your home have vents in the ceilings, floors, or walls?',
+      type: 'vents',
+      opts: [
+        { val: 'true',  lbl: 'Yes', icon: 'vents' },
+        { val: 'false', lbl: 'No',  icon: 'house' }
       ]
     },
     {
@@ -1528,7 +1538,13 @@ function selectSolution(type) {
 }
 
 function handleBack() {
-  if (S.solution === 'hvac' && S.qStep === 3 && S.answers.hasVents === 'false') {
+  if (S.solution === 'hvac' && S.qStep === 4 && S.answers.hasVents === 'true') {
+    S.qStep = 2;
+    render();
+    return;
+  }
+
+  if (S.solution === 'hvac' && S.qStep === 3 && S.radioAnswer === 'new') {
     S.qStep = 1;
     render();
     return;
@@ -1544,7 +1560,7 @@ function handleBack() {
 
 function resetApp() {
   S = { step:'selection', solution:null, answers:{}, qStep:0, radioAnswer:'replacement' };
-  ['vents-modal','zip-modal'].forEach(id => document.getElementById(id).classList.add('hidden'));
+  document.getElementById('zip-modal').classList.add('hidden');
   showPage('step-selection');
 }
 
@@ -1568,6 +1584,8 @@ function render() {
   wrap.appendChild(title);
 
   if      (q.type === 'cards-radio') buildCardsRadio(wrap, q);
+  else if (q.type === 'vents')       buildVentsPage(wrap, q);
+  else if (q.maxSelections)          buildMultiCards(wrap, q);
   else if (q.type === 'cards')       buildCards(wrap, q);
   else if (q.type === 'sqft')        buildSqft(wrap);
   else if (q.type === 'roomSolution') buildRoomSolution(wrap, q);
@@ -1579,7 +1597,7 @@ function render() {
 }
 
 function visualStepCount() {
-  return S.solution === 'hvac' ? 7 : QUESTIONS[S.solution].length;
+  return QUESTIONS[S.solution].length;
 }
 
 function renderDots(total, current) {
@@ -1625,11 +1643,79 @@ function buildCardsRadio(wrap, q) {
       wrap.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
       setTimeout(() => {
-        document.getElementById('vents-modal').classList.remove('hidden');
+        if (S.radioAnswer === 'replacement') {
+          S.qStep = 2; render();
+        } else {
+          S.qStep = 3; render();
+        }
       }, 280);
     };
     cards.appendChild(card);
   });
+  wrap.appendChild(cards);
+}
+
+/* Multi-select cards */
+function buildMultiCards(wrap, q) {
+  const selected = Array.isArray(S.answers[q.id]) ? [...S.answers[q.id]] : [];
+  const cards = document.createElement('div');
+  cards.className = 'opt-cards';
+  q.opts.forEach(o => {
+    const card = document.createElement('div');
+    card.className = 'opt-card' + (selected.includes(o.val) ? ' selected' : '');
+    card.innerHTML = svgIcon(o.icon, 58) + `<span>${o.lbl}</span>${o.sub ? `<small>${o.sub}</small>` : ''}`;
+    card.onclick = () => {
+      const current = Array.isArray(S.answers[q.id]) ? [...S.answers[q.id]] : [];
+      const idx = current.indexOf(o.val);
+
+      if (idx >= 0) {
+        current.splice(idx, 1);
+        card.classList.remove('selected');
+      } else if (current.length < q.maxSelections) {
+        current.push(o.val);
+        card.classList.add('selected');
+      }
+
+      S.answers[q.id] = current;
+      next.disabled = current.length === 0;
+    };
+    cards.appendChild(card);
+  });
+
+  const hint = document.createElement('div');
+  hint.className = 'option-hint';
+  hint.innerHTML = '<div class="hint-arrow">&#8592;</div><span>Select up to<br>two options</span>';
+  cards.appendChild(hint);
+  wrap.appendChild(cards);
+
+  const next = document.createElement('button');
+  next.className = 'next-btn';
+  next.textContent = 'Next';
+  next.disabled = selected.length === 0;
+  next.onclick = () => { S.qStep++; render(); };
+  wrap.appendChild(next);
+}
+
+/* HVAC vents page */
+function buildVentsPage(wrap, q) {
+  const cards = document.createElement('div');
+  cards.className = 'opt-cards';
+  q.opts.forEach(o => {
+    const card = document.createElement('div');
+    card.className = 'opt-card' + (S.answers[q.id] === o.val ? ' selected' : '');
+    card.innerHTML = svgIcon(o.icon, 58) + `<span>${o.lbl}</span>`;
+    card.onclick = () => {
+      S.answers[q.id] = o.val;
+      wrap.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      setTimeout(() => {
+        S.qStep = o.val === 'true' ? 4 : 3;
+        render();
+      }, 280);
+    };
+    cards.appendChild(card);
+  });
+
   wrap.appendChild(cards);
 }
 
@@ -1748,7 +1834,7 @@ function submitRoomSolution() {
 function handleVents(hasVents) {
   document.getElementById('vents-modal').classList.add('hidden');
   S.answers.hasVents = String(hasVents);
-  S.qStep = hasVents ? 2 : 3;  // square footage or individual room solution
+  S.qStep = hasVents ? 4 : 3;
   render();
 }
 
@@ -2023,8 +2109,9 @@ function getPriorityMeta() {
     comfort: { label: 'Precise<br>Comfort', icon: 'comfort' }
   };
 
-  if (S.solution === 'hvac' && S.answers.priority && map[S.answers.priority]) {
-    return map[S.answers.priority];
+  if (S.solution === 'hvac' && S.answers.priority) {
+    const primary = Array.isArray(S.answers.priority) ? S.answers.priority[0] : S.answers.priority;
+    if (map[primary]) return map[primary];
   }
 
   return { label: 'Best<br>Match', icon: S.solution === 'water-heating' ? 'heat-pump' : 'energy-savings' };
@@ -2300,6 +2387,14 @@ function svgIcon(type, size) {
       <path d="M20 35h22"/>
       <path d="M20 40h22"/>
       <path d="M20 45h22"/>
+    </svg>`,
+    vents: `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="12" y="18" width="40" height="28" rx="3"/>
+      <path d="M18 24h28"/>
+      <path d="M18 30h28"/>
+      <path d="M18 36h28"/>
+      <path d="M24 18v28"/>
+      <path d="M36 18v28"/>
     </svg>`,
     house: `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1v-9.5z"/>
