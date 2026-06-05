@@ -858,6 +858,13 @@
     justify-content: center;
   }
 
+  .room-solution-note {
+    font-size: 13px;
+    line-height: 1.15;
+    margin-top: -2px;
+    text-transform: none;
+  }
+
   .room-solution-wrap .next-btn {
     margin-top: 22px;
   }
@@ -1800,7 +1807,8 @@ function buildRoomSolution(wrap, q) {
   const div = document.createElement('div');
   div.className = 'room-solution-wrap';
   const roomCount = S.answers.roomCount || '3';
-  const selected = S.answers[q.id] || '';
+  const selected = S.answers[q.id] || 'highwall-hvac';
+  S.answers[q.id] = selected;
   const roomOptions = ['1', '2', '3', '4', '5+'].map(count =>
     `<option value="${count}" ${roomCount === count ? 'selected' : ''}>${count}</option>`
   ).join('');
@@ -1817,7 +1825,8 @@ function buildRoomSolution(wrap, q) {
   q.opts.forEach(o => {
     const card = document.createElement('div');
     card.className = 'opt-card' + (selected === o.val ? ' selected' : '');
-    card.innerHTML = svgIcon(o.icon, 58) + `<span>${o.lbl}</span>`;
+    const note = o.val === 'highwall-hvac' ? '<small class="room-solution-note">Most common</small>' : '';
+    card.innerHTML = svgIcon(o.icon, 58) + `<span>${o.lbl}</span>${note}`;
     card.onclick = () => {
       S.answers[q.id] = o.val;
       cards.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
