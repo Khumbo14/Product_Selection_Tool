@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-label="Ceiling cassette HVAC in a bright room">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fbfd"/>
+      <stop offset="1" stop-color="#dce7ef"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="420" fill="url(#bg)"/>
+  <path d="M0 190h640" stroke="#c9d6e1" stroke-width="5"/>
+  <path d="M75 58h490l-58 132H132z" fill="#ffffff" stroke="#c8d3de" stroke-width="5"/>
+  <rect x="244" y="78" width="152" height="92" rx="8" fill="#edf2f6" stroke="#94a6b7" stroke-width="5"/>
+  <rect x="274" y="104" width="92" height="40" rx="5" fill="#ffffff" stroke="#a8b7c5" stroke-width="4"/>
+  <path d="M266 91h108M266 157h108M257 101v48M383 101v48" stroke="#7f93a6" stroke-width="5" stroke-linecap="round"/>
+  <rect x="84" y="236" width="184" height="94" rx="16" fill="#c7d1dc"/>
+  <rect x="368" y="236" width="184" height="94" rx="16" fill="#c7d1dc"/>
+  <rect x="120" y="218" width="112" height="54" rx="10" fill="#e2e7ec"/>
+  <rect x="404" y="218" width="112" height="54" rx="10" fill="#e2e7ec"/>
+  <rect x="264" y="318" width="112" height="42" rx="7" fill="#f8fafc" stroke="#d6dee8" stroke-width="4"/>
+  <rect x="286" y="334" width="68" height="8" rx="4" fill="#aab8c8"/>
+</svg>

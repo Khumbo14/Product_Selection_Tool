@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-label="Floor console HVAC in a bedroom">
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7f4f0"/>
+      <stop offset="1" stop-color="#e2e9f0"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9c5aa"/>
+      <stop offset="1" stop-color="#b8926a"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="420" fill="url(#wall)"/>
+  <rect y="300" width="640" height="120" fill="url(#floor)"/>
+  <rect x="82" y="204" width="248" height="86" rx="14" fill="#d5dde7"/>
+  <rect x="112" y="172" width="134" height="70" rx="10" fill="#eef2f5"/>
+  <rect x="350" y="145" width="128" height="170" rx="12" fill="#ffffff" stroke="#a0afbd" stroke-width="5"/>
+  <rect x="380" y="174" width="68" height="72" rx="8" fill="#edf3f7" stroke="#b6c2ce" stroke-width="4"/>
+  <path d="M394 196h40M394 216h40M394 236h40" stroke="#8294a5" stroke-width="5" stroke-linecap="round"/>
+  <path d="M372 275h84" stroke="#8294a5" stroke-width="6" stroke-linecap="round"/>
+  <rect x="105" y="294" width="182" height="36" rx="8" fill="#f8fafc" stroke="#d9e1ea" stroke-width="4"/>
+  <circle cx="535" cy="174" r="42" fill="#e7eef5"/>
+  <path d="M535 132v84M493 174h84" stroke="#c5d1dd" stroke-width="6"/>
+</svg>

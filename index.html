@@ -865,6 +865,29 @@
     text-transform: none;
   }
 
+  .room-solution-cards .opt-card {
+    gap: 12px;
+    justify-content: flex-start;
+    padding: 0 0 16px;
+  }
+
+  .room-solution-image {
+    background-color: #edf2f7;
+    background-position: center;
+    background-size: cover;
+    border-bottom: 1px solid var(--ge-line);
+    height: 112px;
+    width: 100%;
+  }
+
+  .room-solution-cards .opt-card span {
+    padding: 0 12px;
+  }
+
+  .room-solution-cards .opt-card small {
+    margin-top: -6px;
+  }
+
   .room-solution-wrap .next-btn {
     margin-top: 22px;
   }
@@ -1822,11 +1845,20 @@ function buildRoomSolution(wrap, q) {
     <button id="room-solution-next" class="next-btn" onclick="submitRoomSolution()" ${selected ? '' : 'disabled'}>Next</button>`;
 
   const cards = div.querySelector('.room-solution-cards');
+  const roomImages = {
+    'highwall-hvac': 'assets/tile-highwall-hvac.svg',
+    casette: 'assets/tile-casette.svg',
+    console: 'assets/tile-console.svg',
+    'mid-static-duct': 'assets/tile-mid-static-duct.svg'
+  };
   q.opts.forEach(o => {
     const card = document.createElement('div');
     card.className = 'opt-card' + (selected === o.val ? ' selected' : '');
     const note = o.val === 'highwall-hvac' ? '<small class="room-solution-note">Most common</small>' : '';
-    card.innerHTML = svgIcon(o.icon, 58) + `<span>${o.lbl}</span>${note}`;
+    card.innerHTML = `
+      <div class="room-solution-image" style="background-image: url('${roomImages[o.val]}')"></div>
+      <span>${o.lbl}</span>
+      ${note}`;
     card.onclick = () => {
       S.answers[q.id] = o.val;
       cards.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));

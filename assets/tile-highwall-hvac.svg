@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-label="Living room with highwall HVAC">
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f6f7f8"/>
+      <stop offset="1" stop-color="#dfe7ef"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d8c4ad"/>
+      <stop offset="1" stop-color="#b99672"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="420" fill="url(#wall)"/>
+  <rect y="305" width="640" height="115" fill="url(#floor)"/>
+  <rect x="214" y="50" width="214" height="54" rx="10" fill="#ffffff" stroke="#cfd8e2" stroke-width="4"/>
+  <rect x="244" y="91" width="154" height="7" rx="3" fill="#98a7b9"/>
+  <path d="M254 112c25 18 109 18 134 0" fill="none" stroke="#b6c6d6" stroke-width="5" opacity=".8"/>
+  <rect x="92" y="220" width="456" height="92" rx="20" fill="#bec8d4"/>
+  <rect x="112" y="252" width="418" height="86" rx="14" fill="#aebac8"/>
+  <rect x="132" y="188" width="116" height="62" rx="10" fill="#d8dee6"/>
+  <rect x="390" y="188" width="116" height="62" rx="10" fill="#d8dee6"/>
+  <circle cx="288" cy="224" r="34" fill="#f4d3bd"/>
+  <rect x="254" y="256" width="72" height="64" rx="20" fill="#ffffff"/>
+  <circle cx="360" cy="224" r="34" fill="#f7d7c5"/>
+  <rect x="326" y="256" width="72" height="64" rx="20" fill="#f4efe8"/>
+  <rect x="258" y="266" width="118" height="60" rx="7" fill="#dde7f2" stroke="#9aaec3" stroke-width="4"/>
+  <rect x="246" y="324" width="148" height="12" rx="6" fill="#7b8796"/>
+  <rect x="210" y="322" width="220" height="54" rx="6" fill="#f8fafc" stroke="#d8dee7" stroke-width="4"/>
+  <rect x="228" y="336" width="62" height="12" rx="4" fill="#c7d1dd"/>
+  <rect x="308" y="336" width="86" height="12" rx="4" fill="#c7d1dd"/>
+</svg>

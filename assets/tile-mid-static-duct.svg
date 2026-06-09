@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" role="img" aria-label="Concealed mid-static duct HVAC ceiling">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#d8e2ec"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="420" fill="url(#bg)"/>
+  <rect x="70" y="64" width="500" height="146" rx="10" fill="#ffffff" stroke="#d1dce7" stroke-width="5"/>
+  <rect x="102" y="96" width="196" height="72" rx="5" fill="#edf3f7" stroke="#a4b3c2" stroke-width="4"/>
+  <path d="M126 116h148M126 136h148M126 156h148" stroke="#8295a8" stroke-width="6" stroke-linecap="round"/>
+  <path d="M330 110h128c38 0 70 31 70 70v42" fill="none" stroke="#bdcad8" stroke-width="28" stroke-linecap="round"/>
+  <path d="M330 110h128c38 0 70 31 70 70v42" fill="none" stroke="#eef3f7" stroke-width="16" stroke-linecap="round"/>
+  <rect x="112" y="284" width="416" height="58" rx="12" fill="#c4d0dc"/>
+  <rect x="154" y="262" width="120" height="56" rx="8" fill="#e7edf3"/>
+  <rect x="366" y="262" width="120" height="56" rx="8" fill="#e7edf3"/>
+  <rect x="228" y="342" width="184" height="34" rx="8" fill="#f8fafc" stroke="#d7e0e8" stroke-width="4"/>
+</svg>
