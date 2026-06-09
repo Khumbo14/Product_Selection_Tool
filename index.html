@@ -366,7 +366,6 @@
     margin-bottom: 8px;
   }
   .prod-name  { font-size: 16px; font-weight: 700; color: #1a1a1a; }
-  .prod-model { font-size: 12px; color: #999; margin-top: 3px; }
   .prod-price { font-size: 22px; font-weight: 700; color: #1d4ed8; white-space: nowrap; }
 
   .eff-badge {
@@ -1038,12 +1037,6 @@
     font-weight: 700;
     line-height: 1.25;
     min-height: 42px;
-  }
-
-  .rec-product-model {
-    color: var(--ge-soft);
-    font-size: 9px;
-    margin-top: 4px;
   }
 
   .rec-metric-label,
@@ -2154,7 +2147,6 @@ function buildRecommendationMatrix(products) {
     <div class="rec-product-head ${i === selectedIndex ? 'is-recommended' : ''}">
       <div class="rec-img">${productSvg(p.name)}</div>
       <div class="rec-product-name">${p.name}</div>
-      <div class="rec-product-model">${p.model}</div>
     </div>
   `).join('');
 
@@ -2304,14 +2296,14 @@ function comparisonSummary() {
     'GE Appliances Product Recommendation',
     '',
     'Products:',
-    ...products.map((p, i) => `${i + 1}. ${p.name} (${p.model})`)
+    ...products.map((p, i) => `${i + 1}. ${p.name}`)
   ];
 
   lines.push('', 'Comparison:');
   metrics.forEach(metric => {
     const values = products.map((p, i) => {
       const value = metric.values[Math.min(i, metric.values.length - 1)];
-      return `${p.model}: ${value}`;
+      return `${p.name}: ${value}`;
     }).join(' | ');
     lines.push(`${metric.label}: ${values}`);
   });
@@ -2362,7 +2354,6 @@ function buildProductCard(p) {
       <div class="prod-top">
         <div>
           <div class="prod-name">${p.name}</div>
-          <div class="prod-model">${p.model}</div>
         </div>
         <div style="text-align:right">
           <div class="prod-price">${p.price}</div>
