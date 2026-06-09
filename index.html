@@ -1229,6 +1229,54 @@
     height: 18px;
   }
 
+  .rec-value-prop {
+    width: min(630px, calc(100vw - 40px));
+    margin: 44px auto 0;
+    display: grid;
+    grid-template-columns: 176px 1fr;
+    gap: 24px;
+    align-items: center;
+    color: var(--ge-muted);
+    text-align: left;
+  }
+
+  .rec-value-prop-media {
+    aspect-ratio: 1 / 1;
+    background: linear-gradient(135deg, #e6e6e6, #cfcfcf);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .rec-value-prop-media svg {
+    width: 92px;
+    height: 92px;
+    opacity: .72;
+  }
+
+  .rec-value-prop-eyebrow {
+    color: var(--ge-blue);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+
+  .rec-value-prop-title {
+    color: var(--ge-muted);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 16px;
+  }
+
+  .rec-value-prop-copy {
+    color: var(--ge-muted);
+    font-size: 16px;
+    line-height: 1.45;
+  }
+
   @media (max-width: 720px) {
     .page-header {
       min-height: 142px;
@@ -1267,6 +1315,17 @@
     .rec-footer-actions {
       grid-template-columns: 1fr;
       gap: 10px;
+    }
+
+    .rec-value-prop {
+      grid-template-columns: 1fr;
+      max-width: 360px;
+      text-align: center;
+    }
+
+    .rec-value-prop-media {
+      width: 176px;
+      margin: 0 auto;
     }
 
     .room-solution-cards {
@@ -2084,6 +2143,7 @@ function showResults() {
 
 function buildRecommendationMatrix(products) {
   const selectedIndex = Math.min(2, products.length - 1);
+  const bestProduct = products[selectedIndex];
   const priority = getPriorityMeta();
   const metrics = getRecommendationMetrics();
   const matrix = document.createElement('div');
@@ -2151,9 +2211,37 @@ function buildRecommendationMatrix(products) {
       <button class="rec-action-btn is-primary" onclick="sendByEmail()">SEND BY EMAIL</button>
     </div>
     <button class="rec-pro-btn">${getProLabel()} ${svgIcon('wrench', 18)}</button>
+    ${buildValueProposition(bestProduct)}
   `;
 
   return matrix;
+}
+
+function buildValueProposition(product) {
+  if (!product) return '';
+  const headline = getValuePropHeadline(product);
+  const featureText = product.features && product.features.length
+    ? ` Key advantages include ${product.features.slice(0, 3).join(', ').toLowerCase()}.`
+    : '';
+
+  return `
+    <section class="rec-value-prop" aria-label="Best option value proposition">
+      <div class="rec-value-prop-media">${productSvg(product.name)}</div>
+      <div class="rec-value-prop-content">
+        <div class="rec-value-prop-eyebrow">${product.name}</div>
+        <h3 class="rec-value-prop-title">${headline}</h3>
+        <p class="rec-value-prop-copy">${product.desc}${featureText}</p>
+      </div>
+    </section>
+  `;
+}
+
+function getValuePropHeadline(product) {
+  if (product.name.includes('Ductless')) return 'Flexible comfort without adding ductwork';
+  if (product.name.includes('Zoneline')) return 'Quiet, durable comfort for packaged terminal applications';
+  if (product.name.includes('Tankless')) return 'Endless hot water in a space-saving design';
+  if (product.name.includes('HeatPump') || product.name.includes('Heat Pump')) return 'High-efficiency performance for lower energy use';
+  return `${product.name} is the best fit for your needs`;
 }
 
 function getPriorityMeta() {
