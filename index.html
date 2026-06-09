@@ -1575,13 +1575,13 @@ function selectSolution(type) {
 }
 
 function handleBack() {
-  if (S.solution === 'hvac' && S.qStep === 4 && S.answers.hasVents === 'true') {
+  if (S.solution === 'hvac' && S.qStep === 4 && S.answers.hasVents === 'false') {
     S.qStep = 2;
     render();
     return;
   }
 
-  if (S.solution === 'hvac' && S.qStep === 3 && S.radioAnswer === 'new') {
+  if (S.solution === 'hvac' && S.qStep === 3 && S.radioAnswer === 'room-addition') {
     S.qStep = 1;
     render();
     return;
@@ -1746,8 +1746,12 @@ function buildVentsPage(wrap, q) {
       wrap.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
       setTimeout(() => {
-        S.qStep = o.val === 'true' ? 4 : 3;
-        render();
+        if (o.val === 'true') {
+          document.getElementById('zip-modal').classList.remove('hidden');
+        } else {
+          S.qStep = 4;
+          render();
+        }
       }, 280);
     };
     cards.appendChild(card);
@@ -1875,15 +1879,19 @@ function submitRoomSolution() {
   const selected = S.answers.roomSolution;
   if (!selected) return;
   S.answers.roomCount = document.getElementById('room-count').value;
-  showResults();
+  document.getElementById('zip-modal').classList.remove('hidden');
 }
 
 /* ─── Vents modal response ─── */
 function handleVents(hasVents) {
   document.getElementById('vents-modal').classList.add('hidden');
   S.answers.hasVents = String(hasVents);
-  S.qStep = hasVents ? 4 : 3;
-  render();
+  if (hasVents) {
+    document.getElementById('zip-modal').classList.remove('hidden');
+  } else {
+    S.qStep = 4;
+    render();
+  }
 }
 
 /* ─── Gas form ─── */
