@@ -1003,8 +1003,24 @@
   .rec-product-head {
     min-height: 204px;
     padding: 16px 12px 14px;
+    width: 100%;
+    border: 0;
     border-left: 1px solid var(--ge-line);
     background: #fff;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background .16s, box-shadow .16s;
+  }
+
+  .rec-product-head:hover {
+    background: #f8fbff;
+  }
+
+  .rec-product-head:focus-visible {
+    outline: 3px solid rgba(31,69,120,.28);
+    outline-offset: -3px;
   }
 
   .rec-product-head.is-recommended {
@@ -1073,6 +1089,7 @@
     font-size: 12px;
     font-weight: 700;
     text-align: center;
+    cursor: pointer;
   }
 
   .rec-metric-cell.is-recommended {
@@ -1454,7 +1471,8 @@ let S = {
   solution: null,
   answers: {},
   qStep: 0,
-  radioAnswer: 'replacement'
+  radioAnswer: 'replacement',
+  selectedProductIndex: null
 };
 
 /* ─── Products data ─── */
@@ -2128,14 +2146,47 @@ function showResults() {
   S.step = 'results';
   document.getElementById('res-title').textContent = 'Recommended Products';
   showPage('step-results');
+  const products = PRODUCTS[S.solution] || [];
+  S.selectedProductIndex = defaultRecommendationIndex(products);
+  renderRecommendationMatrix(products);
+}
 
+function renderRecommendationMatrix(products = PRODUCTS[S.solution] || []) {
   const grid = document.getElementById('products-grid');
   grid.innerHTML = '';
-  grid.appendChild(buildRecommendationMatrix(PRODUCTS[S.solution]));
+  grid.appendChild(buildRecommendationMatrix(products));
+}
+
+function defaultRecommendationIndex(products) {
+  return products.length ? Math.min(2, products.length - 1) : 0;
+}
+
+function selectedRecommendationIndex(products) {
+  if (
+    Number.isInteger(S.selectedProductIndex) &&
+    S.selectedProductIndex >= 0 &&
+    S.selectedProductIndex < products.length
+  ) {
+    return S.selectedProductIndex;
+  }
+
+  S.selectedProductIndex = defaultRecommendationIndex(products);
+  return S.selectedProductIndex;
+}
+
+function selectRecommendationProduct(index) {
+  const products = PRODUCTS[S.solution] || [];
+
+  if (!Number.isInteger(index) || index < 0 || index >= products.length) {
+    return;
+  }
+
+  S.selectedProductIndex = index;
+  renderRecommendationMatrix(products);
 }
 
 function buildRecommendationMatrix(products) {
-  const selectedIndex = Math.min(2, products.length - 1);
+  const selectedIndex = selectedRecommendationIndex(products);
   const bestProduct = products[selectedIndex];
   const priority = getPriorityMeta();
   const metrics = getRecommendationMetrics();
@@ -2144,7 +2195,14 @@ function buildRecommendationMatrix(products) {
   matrix.style.setProperty('--product-count', products.length);
 
   const productHeads = products.map((p, i) => `
-    <div class="rec-product-head ${i === selectedIndex ? 'is-recommended' : ''}">
+    <div
+      role="button"
+      tabindex="0"
+      class="rec-product-head ${i === selectedIndex ? 'is-recommended' : ''}"
+      data-rec-index="${i}"
+      aria-pressed="${i === selectedIndex ? 'true' : 'false'}"
+      aria-label="${i === selectedIndex ? `${p.name}, selected best option` : `Select ${p.name}`}"
+    >
       <div class="rec-img">${productSvg(p.name)}</div>
       <div class="rec-product-name">${p.name}</div>
     </div>
@@ -2156,7 +2214,7 @@ function buildRecommendationMatrix(products) {
       <span>${metric.label}${metric.note ? `<small> ${metric.note}</small>` : ''}</span>
     </div>
     ${products.map((_, i) => `
-      <div class="rec-metric-cell ${i === selectedIndex ? 'is-recommended' : ''}">
+      <div class="rec-metric-cell ${i === selectedIndex ? 'is-recommended' : ''}" data-rec-index="${i}">
         ${metricValueMarkup(metric, i)}
       </div>
     `).join('')}
@@ -2205,6 +2263,23 @@ function buildRecommendationMatrix(products) {
     <button class="rec-pro-btn">${getProLabel()} ${svgIcon('wrench', 18)}</button>
     ${buildValueProposition(bestProduct)}
   `;
+
+  matrix.addEventListener('click', event => {
+    const target = event.target.closest('[data-rec-index]');
+    if (!target || !matrix.contains(target)) return;
+
+    selectRecommendationProduct(Number(target.dataset.recIndex));
+  });
+
+  matrix.addEventListener('keydown', event => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+
+    const target = event.target.closest('.rec-product-head[data-rec-index]');
+    if (!target || !matrix.contains(target)) return;
+
+    event.preventDefault();
+    selectRecommendationProduct(Number(target.dataset.recIndex));
+  });
 
   return matrix;
 }
