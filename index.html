@@ -1659,12 +1659,6 @@ function handleBack() {
     return;
   }
 
-  if (S.solution === 'hvac' && S.qStep === 3 && S.radioAnswer === 'room-addition') {
-    S.qStep = 1;
-    render();
-    return;
-  }
-
   if (S.qStep > 0) {
     S.qStep--;
     render();
@@ -1758,11 +1752,8 @@ function buildCardsRadio(wrap, q) {
       wrap.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
       setTimeout(() => {
-        if (S.radioAnswer === 'replacement') {
-          S.qStep = 2; render();
-        } else {
-          S.qStep = 3; render();
-        }
+        S.qStep++;
+        render();
       }, 280);
     };
     cards.appendChild(card);
