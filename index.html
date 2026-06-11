@@ -1936,7 +1936,7 @@ function buildRoomSolution(wrap, q) {
   q.opts.forEach(o => {
     const card = document.createElement('div');
     card.className = 'opt-card' + (selected === o.val ? ' selected' : '');
-    const note = o.val === 'highwall-hvac' ? '<small class="room-solution-note">Most common</small>' : '';
+    const note = o.val === 'highwall-hvac' ? '<small class="room-solution-note">(Most common)</small>' : '';
     card.innerHTML = `
       <div class="room-solution-image" style="background-image: url('${roomImages[o.val]}')"></div>
       <span>${o.lbl}</span>
