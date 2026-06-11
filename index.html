@@ -1125,13 +1125,21 @@
     border-left: 1px solid var(--ge-line);
   }
 
-  .rec-best-slot.is-recommended {
+  .rec-best-slot.is-selected,
+  .rec-best-slot.is-best-option {
     display: flex;
     align-items: center;
     justify-content: center;
     border: 2px solid var(--ge-blue);
     border-top: 0;
     border-radius: 0 0 9px 9px;
+  }
+
+  .rec-best-slot.is-selected {
+    background: var(--ge-blue-tint);
+  }
+
+  .rec-best-slot.is-best-option {
     background: var(--ge-blue);
     color: #fff;
     font-size: 11px;
@@ -2186,6 +2194,7 @@ function selectRecommendationProduct(index) {
 }
 
 function buildRecommendationMatrix(products) {
+  const recommendedIndex = defaultRecommendationIndex(products);
   const selectedIndex = selectedRecommendationIndex(products);
   const bestProduct = products[selectedIndex];
   const priority = getPriorityMeta();
@@ -2223,8 +2232,8 @@ function buildRecommendationMatrix(products) {
   const bestRow = `
     <div class="rec-best-label"></div>
     ${products.map((_, i) => `
-      <div class="rec-best-slot ${i === selectedIndex ? 'is-recommended' : ''}">
-        ${i === selectedIndex ? 'Best Option' : ''}
+      <div class="rec-best-slot ${i === selectedIndex ? 'is-selected' : ''} ${i === recommendedIndex ? 'is-best-option' : ''}">
+        ${i === recommendedIndex ? 'Best Option' : ''}
       </div>
     `).join('')}
   `;
