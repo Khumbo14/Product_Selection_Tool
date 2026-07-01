@@ -829,17 +829,35 @@
     text-align: center;
   }
 
-  .room-count-select {
-    appearance: auto;
+  .room-count-cards {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(5, minmax(58px, 76px));
+    justify-content: center;
+    margin: 0 auto;
+    max-width: 440px;
+  }
+
+  .room-count-card {
+    align-items: center;
+    aspect-ratio: 1 / 1;
     background: #fff;
-    border: 1px solid var(--ge-line);
-    border-radius: 0;
-    color: var(--ge-muted);
-    font-size: 14px;
-    height: 31px;
-    margin-top: -30px;
-    padding: 0 8px;
-    width: 80px;
+    border: 2px solid var(--ge-line);
+    border-radius: 8px;
+    color: var(--ge-ink);
+    display: flex;
+    font-size: 24px;
+    font-weight: 700;
+    justify-content: center;
+    transition: background .2s, border-color .2s, color .2s;
+    width: 100%;
+  }
+
+  .room-count-card:hover,
+  .room-count-card.selected {
+    background: var(--ge-blue-tint);
+    border-color: var(--ge-blue);
+    color: var(--ge-blue);
   }
 
   .room-solution-subtitle {
@@ -855,13 +873,6 @@
     gap: 15px;
     grid-template-columns: repeat(4, 201px);
     justify-content: center;
-  }
-
-  .room-solution-note {
-    font-size: 13px;
-    line-height: 1.15;
-    margin-top: -2px;
-    text-transform: none;
   }
 
   .room-solution-cards .opt-card {
@@ -880,11 +891,11 @@
   }
 
   .room-solution-cards .opt-card span {
+    font-size: 13px;
+    letter-spacing: 0;
+    line-height: 1.25;
     padding: 0 12px;
-  }
-
-  .room-solution-cards .opt-card small {
-    margin-top: -6px;
+    text-transform: none;
   }
 
   .room-solution-wrap .next-btn {
@@ -1349,6 +1360,11 @@
     .room-solution-cards {
       grid-template-columns: repeat(2, minmax(145px, 201px));
     }
+
+    .room-count-cards {
+      grid-template-columns: repeat(3, minmax(58px, 76px));
+      max-width: 256px;
+    }
   }
 
   @media (max-width: 420px) {
@@ -1369,6 +1385,11 @@
 
     .room-solution-cards {
       grid-template-columns: minmax(145px, 201px);
+    }
+
+    .room-count-cards {
+      grid-template-columns: repeat(2, minmax(58px, 76px));
+      max-width: 166px;
     }
   }
 </style>
@@ -1480,6 +1501,7 @@ let S = {
   answers: {},
   qStep: 0,
   radioAnswer: 'replacement',
+  roomSolutionStage: 'count',
   selectedProductIndex: null
 };
 
@@ -1609,13 +1631,13 @@ const QUESTIONS = {
     },
     {
       id: 'roomSolution',
-      q: 'How many rooms are you looking to have a solution for?',
+      q: 'How many rooms are you looking to have a solution for',
       type: 'roomSolution',
       opts: [
-        { val: 'highwall-hvac',   lbl: 'Highwall HVAC',   icon: 'highwall-hvac'   },
-        { val: 'casette',         lbl: 'Casette',         icon: 'casette'         },
-        { val: 'console',         lbl: 'Console',         icon: 'console'         },
-        { val: 'mid-static-duct', lbl: 'Mid-Static Duct', icon: 'mid-static-duct' }
+        { val: 'highwall-hvac',   lbl: 'Highwall (most common)',                  icon: 'highwall-hvac'   },
+        { val: 'casette',         lbl: 'Cassette (installed in the ceiling)',      icon: 'casette'         },
+        { val: 'console',         lbl: 'Console (low on the wall/floor)',          icon: 'console'         },
+        { val: 'mid-static-duct', lbl: 'Ducted (concealed in the ceiling/wall)',   icon: 'mid-static-duct' }
       ]
     }
   ],
@@ -1647,13 +1669,18 @@ function showPage(id) {
 }
 
 function selectSolution(type) {
-  S = { step:'questionnaire', solution:type, answers:{}, qStep:0, radioAnswer:'replacement' };
+  S = { step:'questionnaire', solution:type, answers:{}, qStep:0, radioAnswer:'replacement', roomSolutionStage:'count' };
   showPage('step-questionnaire');
   render();
 }
 
 function handleBack() {
   if (S.solution === 'hvac' && S.qStep === 4 && S.answers.hasVents === 'false') {
+    if (S.roomSolutionStage === 'type') {
+      S.roomSolutionStage = 'count';
+      render();
+      return;
+    }
     S.qStep = 2;
     render();
     return;
@@ -1668,7 +1695,7 @@ function handleBack() {
 }
 
 function resetApp() {
-  S = { step:'selection', solution:null, answers:{}, qStep:0, radioAnswer:'replacement' };
+  S = { step:'selection', solution:null, answers:{}, qStep:0, radioAnswer:'replacement', roomSolutionStage:'count' };
   document.getElementById('zip-modal').classList.add('hidden');
   showPage('step-selection');
 }
@@ -1819,6 +1846,7 @@ function buildVentsPage(wrap, q) {
           document.getElementById('zip-modal').classList.remove('hidden');
         } else {
           S.qStep = 4;
+          S.roomSolutionStage = 'count';
           render();
         }
       }, 280);
@@ -1902,36 +1930,53 @@ function handleZip() {
 function buildRoomSolution(wrap, q) {
   const div = document.createElement('div');
   div.className = 'room-solution-wrap';
-  const roomCount = S.answers.roomCount || '3';
-  const selected = S.answers[q.id] || 'highwall-hvac';
-  S.answers[q.id] = selected;
-  const roomOptions = ['1', '2', '3', '4', '5+'].map(count =>
-    `<option value="${count}" ${roomCount === count ? 'selected' : ''}>${count}</option>`
-  ).join('');
+  const title = wrap.querySelector('.q-title');
+
+  if (S.roomSolutionStage !== 'type') {
+    const cards = document.createElement('div');
+    cards.className = 'room-count-cards';
+    ['1', '2', '3', '4', '5+'].forEach(count => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'room-count-card' + (S.answers.roomCount === count ? ' selected' : '');
+      card.textContent = count;
+      card.onclick = () => {
+        S.answers.roomCount = count;
+        cards.querySelectorAll('.room-count-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        setTimeout(() => {
+          S.roomSolutionStage = 'type';
+          render();
+        }, 220);
+      };
+      cards.appendChild(card);
+    });
+
+    div.appendChild(cards);
+    wrap.appendChild(div);
+    return;
+  }
+
+  title.textContent = 'Are you looking for one of these in each individual room?';
+  const selected = S.answers[q.id] || '';
 
   div.innerHTML = `
-    <select id="room-count" class="room-count-select" onchange="S.answers.roomCount = this.value">
-      ${roomOptions}
-    </select>
-    <div class="room-solution-subtitle">Are you looking for one of these in each individual room?</div>
     <div class="room-solution-cards"></div>
     <button id="room-solution-next" class="next-btn" onclick="submitRoomSolution()" ${selected ? '' : 'disabled'}>Next</button>`;
 
   const cards = div.querySelector('.room-solution-cards');
   const roomImages = {
-    'highwall-hvac': 'assets/tile-highwall-hvac.svg',
+    'highwall-hvac': 'assets/tile-highwall-hvac.png',
     casette: 'assets/tile-casette.svg',
-    console: 'assets/tile-console.svg',
+    console: 'assets/tile-console.png',
     'mid-static-duct': 'assets/tile-mid-static-duct.svg'
   };
   q.opts.forEach(o => {
     const card = document.createElement('div');
     card.className = 'opt-card' + (selected === o.val ? ' selected' : '');
-    const note = o.val === 'highwall-hvac' ? '<small class="room-solution-note">(Most common)</small>' : '';
     card.innerHTML = `
       <div class="room-solution-image" style="background-image: url('${roomImages[o.val]}')"></div>
-      <span>${o.lbl}</span>
-      ${note}`;
+      <span>${o.lbl}</span>`;
     card.onclick = () => {
       S.answers[q.id] = o.val;
       cards.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
@@ -1946,8 +1991,7 @@ function buildRoomSolution(wrap, q) {
 
 function submitRoomSolution() {
   const selected = S.answers.roomSolution;
-  if (!selected) return;
-  S.answers.roomCount = document.getElementById('room-count').value;
+  if (!selected || !S.answers.roomCount) return;
   document.getElementById('zip-modal').classList.remove('hidden');
 }
 
@@ -1959,6 +2003,7 @@ function handleVents(hasVents) {
     document.getElementById('zip-modal').classList.remove('hidden');
   } else {
     S.qStep = 4;
+    S.roomSolutionStage = 'count';
     render();
   }
 }
