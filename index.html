@@ -657,7 +657,7 @@
     gap: 0;
     width: min(530px, calc(100% - 32px));
     margin: 0 auto;
-    justify-content: flex-start;
+    justify-content: center;
     padding: 5px 0 37px;
   }
 
@@ -748,6 +748,59 @@
 
   .next-btn:hover {
     background: var(--ge-blue-dark);
+  }
+
+  .priority-question {
+    max-width: 760px;
+  }
+
+  .priority-question .q-title {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 34px;
+  }
+
+  .priority-question .opt-cards {
+    width: 100%;
+    max-width: 690px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin: 0 auto;
+  }
+
+  .priority-question .opt-card {
+    width: 100%;
+    height: 218px;
+    padding: 20px 16px;
+    gap: 12px;
+  }
+
+  .priority-question .opt-card span {
+    font-size: 18px;
+  }
+
+  .priority-question .option-hint {
+    width: auto;
+    height: auto;
+    margin: 22px auto 0;
+    gap: 8px;
+    color: var(--ge-muted);
+  }
+
+  .priority-question .option-hint .hint-arrow {
+    color: var(--ge-blue);
+    font-size: 22px;
+  }
+
+  .priority-question .option-hint span {
+    max-width: none;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .priority-question .next-btn {
+    min-width: 136px;
+    margin-top: 30px;
   }
 
   .sqft-input {
@@ -1342,6 +1395,11 @@
       max-width: 417px;
     }
 
+    .priority-question .opt-cards {
+      grid-template-columns: repeat(2, minmax(145px, 201px));
+      max-width: 420px;
+    }
+
     .solution-card,
     .opt-card,
     .option-hint {
@@ -1384,6 +1442,10 @@
   @media (max-width: 420px) {
     .solution-cards,
     .opt-cards {
+      grid-template-columns: minmax(145px, 201px);
+    }
+
+    .priority-question .opt-cards {
       grid-template-columns: minmax(145px, 201px);
     }
 
@@ -1639,7 +1701,7 @@ const QUESTIONS = {
       type: 'cards',
       maxSelections: 2,
       opts: [
-        { val: 'efficiency-savings', lbl: 'Energy<br>Efficiency/Savings', sub: '(SEER2/HSPF2)',     icon: 'energy-savings' },
+        { val: 'efficiency-savings', lbl: 'Energy Efficiency<br>/ Savings', sub: '(SEER2/HSPF2)',     icon: 'energy-savings' },
         { val: 'quiet',              lbl: 'Quiet<br>Operation',           sub: '(Sound Level DBA)', icon: 'quiet' },
         { val: 'cost',               lbl: 'System<br>Purchase Cost',                                icon: 'purchase-cost' }
       ]
@@ -1756,6 +1818,7 @@ function render() {
   const wrap = document.createElement('div');
   wrap.className = 'q-wrap';
   if (q.type === 'roomSolution') wrap.classList.add('q-wrap-wide');
+  if (q.id === 'priority') wrap.classList.add('priority-question');
 
   const title = document.createElement('h2');
   title.className = 'q-title';
@@ -1860,9 +1923,9 @@ function buildMultiCards(wrap, q) {
 
   const hint = document.createElement('div');
   hint.className = 'option-hint';
-  hint.innerHTML = '<div class="hint-arrow">&#8592;</div><span>Select up to<br>two options</span>';
-  cards.appendChild(hint);
+  hint.innerHTML = '<div class="hint-arrow">&#10003;</div><span>Select up to two options</span>';
   wrap.appendChild(cards);
+  wrap.appendChild(hint);
 
   const next = document.createElement('button');
   next.className = 'next-btn';
