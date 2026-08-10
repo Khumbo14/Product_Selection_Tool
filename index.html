@@ -1585,6 +1585,24 @@ const PRODUCTS = {
   ]
 };
 
+const HVAC_SINGLE_ZONE_SERIES = [
+  {
+    name: 'Caliber Single-Zone',
+    desc: 'A single-zone ductless series designed for efficient, dependable comfort in one room.',
+    features: ['Single-room comfort','Ductless installation','Dependable performance']
+  },
+  {
+    name: 'Altitude Single-Zone',
+    desc: 'A single-zone ductless series balancing energy efficiency, quiet operation, and comfort.',
+    features: ['Single-room comfort','Ductless installation','Quiet operation']
+  },
+  {
+    name: 'Endure Single-Zone',
+    desc: 'A premium single-zone ductless series for precise, high-efficiency comfort in one room.',
+    features: ['Single-room comfort','Ductless installation','Precise temperature control']
+  }
+];
+
 /* ─── Question definitions ─── */
 const QUESTIONS = {
   hvac: [
@@ -2188,14 +2206,38 @@ const TITLES = { hvac:'HVAC Systems', 'water-heating':'Water Heating Solutions' 
 
 function showResults() {
   S.step = 'results';
-  document.getElementById('res-title').textContent = 'Recommended Products';
+  const products = getResultsProducts();
+  document.getElementById('res-title').textContent = isSingleZoneDuctlessPath()
+    ? 'Recommended Series'
+    : 'Recommended Products';
   showPage('step-results');
-  const products = PRODUCTS[S.solution] || [];
   S.selectedProductIndex = defaultRecommendationIndex(products);
   renderRecommendationMatrix(products);
 }
 
-function renderRecommendationMatrix(products = PRODUCTS[S.solution] || []) {
+function isSingleZoneHighwallPath() {
+  return isSingleZoneDuctlessPath() &&
+    S.answers.roomSolution === 'highwall-hvac';
+}
+
+function isSingleZoneDuctlessPath() {
+  return S.solution === 'hvac' &&
+    S.answers.hasVents === 'false' &&
+    S.answers.roomCount === '1';
+}
+
+function isSingleZoneAlternateIndoorUnitPath() {
+  return isSingleZoneDuctlessPath() &&
+    ['casette', 'console', 'mid-static-duct'].includes(S.answers.roomSolution);
+}
+
+function getResultsProducts() {
+  if (isSingleZoneHighwallPath()) return HVAC_SINGLE_ZONE_SERIES;
+  if (isSingleZoneAlternateIndoorUnitPath()) return HVAC_SINGLE_ZONE_SERIES.slice(1);
+  return PRODUCTS[S.solution] || [];
+}
+
+function renderRecommendationMatrix(products = getResultsProducts()) {
   const grid = document.getElementById('products-grid');
   grid.innerHTML = '';
   grid.appendChild(buildRecommendationMatrix(products));
@@ -2219,7 +2261,7 @@ function selectedRecommendationIndex(products) {
 }
 
 function selectRecommendationProduct(index) {
-  const products = PRODUCTS[S.solution] || [];
+  const products = getResultsProducts();
 
   if (!Number.isInteger(index) || index < 0 || index >= products.length) {
     return;
@@ -2410,7 +2452,7 @@ function getProLabel() {
 }
 
 function comparisonSummary() {
-  const products = PRODUCTS[S.solution] || [];
+  const products = getResultsProducts();
   const metrics = getRecommendationMetrics();
   const lines = [
     'GE Appliances Product Recommendation',
@@ -2706,7 +2748,7 @@ function productSvg(name) {
       <line x1="14" y1="42" x2="14" y2="50"/>
       <line x1="50" y1="42" x2="50" y2="50"/>
     </svg>`;
-  if (name.includes('Ductless') || name.includes('MiniMax'))
+  if (name.includes('Ductless') || name.includes('MiniMax') || name.includes('Single-Zone'))
     return `<svg width="80" height="80" viewBox="0 0 64 64" fill="none" stroke="#1f4578" stroke-width="1.8" stroke-linecap="round" opacity=".55">
       <rect x="8" y="18" width="48" height="14" rx="3"/>
       <line x1="14" y1="25" x2="50" y2="25"/>
