@@ -1058,6 +1058,15 @@
     height: 76px;
   }
 
+  .series-logo {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 88%;
+    max-height: 88%;
+    object-fit: contain;
+  }
+
   .rec-product-name {
     color: var(--ge-ink);
     font-size: 11px;
@@ -1282,6 +1291,11 @@
     width: 92px;
     height: 92px;
     opacity: .72;
+  }
+
+  .rec-value-prop-media .series-logo {
+    max-width: 82%;
+    max-height: 82%;
   }
 
   .rec-value-prop-eyebrow {
@@ -1600,6 +1614,19 @@ const HVAC_SINGLE_ZONE_SERIES = [
     name: 'Endure Single-Zone',
     desc: 'A premium single-zone ductless series for precise, high-efficiency comfort in one room.',
     features: ['Single-room comfort','Ductless installation','Precise temperature control']
+  }
+];
+
+const HVAC_MULTI_ZONE_SERIES = [
+  {
+    name: 'Altitude Multi-Zone',
+    desc: 'A multi-zone ductless series balancing energy efficiency, quiet operation, and comfort across multiple rooms.',
+    features: ['Multiple-room comfort','Ductless installation','Quiet operation']
+  },
+  {
+    name: 'Endure Multi-Zone',
+    desc: 'A premium multi-zone ductless series for precise, high-efficiency comfort across multiple rooms.',
+    features: ['Multiple-room comfort','Ductless installation','Precise temperature control']
   }
 ];
 
@@ -2207,7 +2234,7 @@ const TITLES = { hvac:'HVAC Systems', 'water-heating':'Water Heating Solutions' 
 function showResults() {
   S.step = 'results';
   const products = getResultsProducts();
-  document.getElementById('res-title').textContent = isSingleZoneDuctlessPath()
+  document.getElementById('res-title').textContent = isDuctlessRoomSolutionPath()
     ? 'Recommended Series'
     : 'Recommended Products';
   showPage('step-results');
@@ -2221,9 +2248,7 @@ function isSingleZoneHighwallPath() {
 }
 
 function isSingleZoneDuctlessPath() {
-  return S.solution === 'hvac' &&
-    S.answers.hasVents === 'false' &&
-    S.answers.roomCount === '1';
+  return isDuctlessRoomSolutionPath() && S.answers.roomCount === '1';
 }
 
 function isSingleZoneAlternateIndoorUnitPath() {
@@ -2231,9 +2256,21 @@ function isSingleZoneAlternateIndoorUnitPath() {
     ['casette', 'console', 'mid-static-duct'].includes(S.answers.roomSolution);
 }
 
+function isDuctlessRoomSolutionPath() {
+  return S.solution === 'hvac' &&
+    S.answers.hasVents === 'false' &&
+    ['highwall-hvac', 'casette', 'console', 'mid-static-duct'].includes(S.answers.roomSolution);
+}
+
+function isMultiZoneDuctlessPath() {
+  return isDuctlessRoomSolutionPath() &&
+    ['2', '3', '4', '5+'].includes(S.answers.roomCount);
+}
+
 function getResultsProducts() {
   if (isSingleZoneHighwallPath()) return HVAC_SINGLE_ZONE_SERIES;
   if (isSingleZoneAlternateIndoorUnitPath()) return HVAC_SINGLE_ZONE_SERIES.slice(1);
+  if (isMultiZoneDuctlessPath()) return HVAC_MULTI_ZONE_SERIES;
   return PRODUCTS[S.solution] || [];
 }
 
@@ -2712,6 +2749,16 @@ function svgIcon(type, size) {
 }
 
 function productSvg(name) {
+  const seriesLogos = {
+    Caliber: 'assets/caliber-logo.png',
+    Altitude: 'assets/altitude-logo.png',
+    Endure: 'assets/endure-logo.png'
+  };
+  const seriesName = Object.keys(seriesLogos).find(series => name.includes(series));
+  if (seriesName) {
+    return `<img class="series-logo" src="${seriesLogos[seriesName]}" alt="" />`;
+  }
+
   if (name.includes('Tankless'))
     return `<svg width="80" height="80" viewBox="0 0 64 64" fill="none" stroke="#1f4578" stroke-width="1.8" stroke-linecap="round" opacity=".55">
       <rect x="22" y="6" width="20" height="52" rx="3"/>
@@ -2748,7 +2795,7 @@ function productSvg(name) {
       <line x1="14" y1="42" x2="14" y2="50"/>
       <line x1="50" y1="42" x2="50" y2="50"/>
     </svg>`;
-  if (name.includes('Ductless') || name.includes('MiniMax') || name.includes('Single-Zone'))
+  if (name.includes('Ductless') || name.includes('MiniMax') || name.includes('Single-Zone') || name.includes('Multi-Zone'))
     return `<svg width="80" height="80" viewBox="0 0 64 64" fill="none" stroke="#1f4578" stroke-width="1.8" stroke-linecap="round" opacity=".55">
       <rect x="8" y="18" width="48" height="14" rx="3"/>
       <line x1="14" y1="25" x2="50" y2="25"/>
