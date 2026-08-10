@@ -1639,11 +1639,9 @@ const QUESTIONS = {
       type: 'cards',
       maxSelections: 2,
       opts: [
-        { val: 'efficiency', lbl: 'Energy<br>Efficiency', icon: 'energy-home' },
-        { val: 'savings',    lbl: 'Energy Savings',       sub: '(SEER2/HSPF2)',       icon: 'energy-savings' },
-        { val: 'quiet',      lbl: 'Quiet<br>Operation',   sub: '(Sound Level DBA)',   icon: 'quiet' },
-        { val: 'cost',       lbl: 'System<br>Purchase Cost', icon: 'purchase-cost' },
-        { val: 'comfort',    lbl: 'Precise<br>Comfort',   icon: 'comfort' }
+        { val: 'efficiency-savings', lbl: 'Energy<br>Efficiency/Savings', sub: '(SEER2/HSPF2)',     icon: 'energy-savings' },
+        { val: 'quiet',              lbl: 'Quiet<br>Operation',           sub: '(Sound Level DBA)', icon: 'quiet' },
+        { val: 'cost',               lbl: 'System<br>Purchase Cost',                                icon: 'purchase-cost' }
       ]
     },
     {
@@ -2281,7 +2279,38 @@ function renderRecommendationMatrix(products = getResultsProducts()) {
 }
 
 function defaultRecommendationIndex(products) {
+  const preferredSeries = getPreferredDuctlessSeriesName();
+  if (preferredSeries) {
+    const preferredIndex = products.findIndex(product => product.name.includes(preferredSeries));
+    if (preferredIndex >= 0) return preferredIndex;
+
+    // Caliber is not offered for cassette, console, or mid-static duct systems.
+    if (preferredSeries === 'Caliber' && products.length) return 0;
+  }
+
   return products.length ? Math.min(2, products.length - 1) : 0;
+}
+
+function getPreferredDuctlessSeriesName() {
+  if (!isDuctlessRoomSolutionPath()) return null;
+
+  const priorities = Array.isArray(S.answers.priority)
+    ? S.answers.priority
+    : (S.answers.priority ? [S.answers.priority] : []);
+  const selected = new Set(priorities);
+
+  if (selected.size === 1) {
+    if (selected.has('cost')) return isMultiZoneDuctlessPath() ? 'Altitude' : 'Caliber';
+    if (selected.has('efficiency-savings') || selected.has('quiet')) return 'Endure';
+  }
+
+  if (selected.size === 2) {
+    if (selected.has('efficiency-savings') && selected.has('quiet')) return 'Endure';
+    if (selected.has('cost') &&
+        (selected.has('efficiency-savings') || selected.has('quiet'))) return 'Altitude';
+  }
+
+  return null;
 }
 
 function selectedRecommendationIndex(products) {
@@ -2437,11 +2466,9 @@ function getValuePropHeadline(product) {
 
 function getPriorityMeta() {
   const map = {
-    efficiency: { label: 'Energy<br>Efficiency', icon: 'energy-home' },
-    savings: { label: 'Energy<br>Savings', icon: 'energy-savings' },
+    'efficiency-savings': { label: 'Energy Efficiency<br>/ Savings', icon: 'energy-savings' },
     quiet: { label: 'Quiet<br>Operation', icon: 'quiet' },
-    cost: { label: 'Purchase<br>Cost', icon: 'purchase-cost' },
-    comfort: { label: 'Precise<br>Comfort', icon: 'comfort' }
+    cost: { label: 'Purchase<br>Cost', icon: 'purchase-cost' }
   };
 
   if (S.solution === 'hvac' && S.answers.priority) {
