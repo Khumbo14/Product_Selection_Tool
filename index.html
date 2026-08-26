@@ -1,17 +1,16 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>GE Appliances â€“ Product Selection Tool</title>
+<title>GE Appliances Product Selection Tool</title>
 <style>
-  /* â”€â”€ Reset â”€â”€ */
+
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, sans-serif; background: #fff; color: #333; min-height: 100vh; }
   button { font-family: inherit; cursor: pointer; }
   .hidden { display: none !important; }
 
-  /* â”€â”€ Header â”€â”€ */
   .page-header {
     background: #003B71;
     padding: 28px 20px;
@@ -25,9 +24,9 @@
     text-transform: uppercase;
   }
 
-  /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     STEP 1 â€“ SOLUTION SELECTOR
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+  /* ============================
+     STEP 1 - SOLUTION SELECTOR
+  ============================ */
   #step-selection {
     padding: 70px 20px;
     text-align: center;
@@ -75,9 +74,9 @@
   }
   .solution-card:hover span { color: #003B71; }
 
-  /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     STEP 2 â€“ QUESTIONNAIRE
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+  /* ============================
+     STEP 2 - QUESTIONNAIRE
+  ============================ */
   #step-questionnaire { padding-bottom: 80px; }
 
   .back-btn {
@@ -245,9 +244,9 @@
     cursor: pointer;
   }
 
-  /* â•â•â•â•â•â•â•â•â•â•â•
+  /* ===========
      MODALS
-  â•â•â•â•â•â•â•â•â•â•â• */
+  =========== */
   .modal-overlay {
     position: fixed;
     inset: 0;
@@ -294,9 +293,9 @@
   }
   .zip-input:focus { border-color: #003B71; }
 
-  /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     STEP 3 â€“ RESULTS
-  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+  /* ============================
+     STEP 3 - RESULTS
+  ============================ */
   #step-results { padding: 44px 24px 80px; max-width: 1120px; margin: 0 auto; }
 
   .start-over {
@@ -1511,14 +1510,14 @@
 </head>
 <body>
 
-<!-- â•â•â•â•â•â•â•â•â•â• HEADER â•â•â•â•â•â•â•â•â•â• -->
+<!-- ========== HEADER ========== -->
 <div class="page-header">
   <h1>Product Selection Tool</h1>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     STEP 1 â€“ SOLUTION SELECTOR
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ==============================
+     STEP 1 - SOLUTION SELECTOR
+============================== -->
 <div id="step-selection">
   <h2>What type of solution are you looking for?</h2>
   <div class="solution-cards">
@@ -1557,18 +1556,18 @@
   </div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     STEP 2 â€“ QUESTIONNAIRE
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ==============================
+     STEP 2 - QUESTIONNAIRE
+============================== -->
 <div id="step-questionnaire" class="hidden">
   <button class="back-btn" onclick="handleBack()">&#8592; Back</button>
   <div class="progress-dots" id="progress-dots"></div>
   <div id="question-content"></div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-     STEP 3 â€“ RESULTS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<!-- ==============================
+     STEP 3 - RESULTS
+============================== -->
 <div id="step-results" class="hidden">
   <button class="start-over" onclick="resetApp()">&#8592; Start Over</button>
   <div class="res-header">
@@ -1587,7 +1586,7 @@
   </div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â• VENTS MODAL â•â•â•â•â•â•â•â•â•â• -->
+<!-- ========== VENTS MODAL ========== -->
 <div id="vents-modal" class="modal-overlay hidden">
   <div class="modal-box vents-modal-box">
     <h3>Does your home have vents in the ceilings, floors, or walls?</h3>
@@ -1598,7 +1597,7 @@
   </div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â• ZIP MODAL â•â•â•â•â•â•â•â•â•â• -->
+<!-- ========== ZIP MODAL ========== -->
 <div id="zip-modal" class="modal-overlay hidden">
   <div class="modal-box">
     <h3>What is your zip code?</h3>
@@ -1611,11 +1610,11 @@
   </div>
 </div>
 
-<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+<!-- ======================================
      SCRIPTS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+====================================== -->
 <script>
-/* â”€â”€â”€ State â”€â”€â”€ */
+/* --- State --- */
 let S = {
   step: 'selection',
   solution: null,
@@ -1626,7 +1625,7 @@ let S = {
   selectedProductIndex: null
 };
 
-/* â”€â”€â”€ Products data â”€â”€â”€ */
+/* --- Products data --- */
 const PRODUCTS = {
   hvac: [
     {
@@ -1651,7 +1650,7 @@ const PRODUCTS = {
       name: 'GE Ductless MiniMax', model: 'DLMX12HSWF',
       price: '$2,899', rating: 4.7, reviews: 198,
       efficiency: 'SEER 22',
-      desc: 'Compact ductless mini-split perfect for zone heating and cooling â€” no ductwork needed.',
+      desc: 'Compact ductless mini-split perfect for zone heating and cooling -- no ductwork needed.',
       features: ['Multi-zone capability','Whisper-quiet indoor unit','Sleek wall-mounted design','Remote control included','Easy installation'],
       specs: 'Cooling capacity: 12,000 BTU. Heating: 13,600 BTU. Indoor noise: 25 dB.',
       warranty: '7-year parts & 5-year compressor warranty.'
@@ -1691,7 +1690,7 @@ const PRODUCTS = {
       efficiency: '0.92 UEF',
       desc: 'Reliable electric water heater with excellent insulation and durability.',
       features: ['50-gallon capacity','Self-cleaning feature','Durable glass-lined tank','6-year warranty','Easy maintenance'],
-      specs: 'Capacity: 50 gal. Wattage: 4,500W. Recovery: 21 GPH at 90Â°F rise.',
+      specs: 'Capacity: 50 gal. Wattage: 4,500W. Recovery: 21 GPH at 90&deg;F rise.',
       warranty: '6-year limited tank & parts warranty.'
     },
     {
@@ -1737,7 +1736,7 @@ const HVAC_MULTI_ZONE_SERIES = [
   }
 ];
 
-/* â”€â”€â”€ Question definitions â”€â”€â”€ */
+/* --- Question definitions --- */
 const QUESTIONS = {
   hvac: [
     {
@@ -1817,9 +1816,9 @@ const QUESTIONS = {
   ]
 };
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* -------------------------------------
    NAVIGATION
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+------------------------------------- */
 function showPage(id) {
   ['step-selection','step-questionnaire','step-results'].forEach(s =>
     document.getElementById(s).classList.add('hidden')
@@ -1859,9 +1858,9 @@ function resetApp() {
   showPage('step-selection');
 }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* -------------------------------------
    RENDER QUESTIONNAIRE
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+------------------------------------- */
 function render() {
   const qs = QUESTIONS[S.solution];
   renderDots(visualStepCount(), S.qStep);
@@ -1912,7 +1911,7 @@ function renderDots(total, current) {
   }
 }
 
-/* â”€â”€â”€ Cards + radio (HVAC fuel type) â”€â”€â”€ */
+/* --- Cards + radio (HVAC fuel type) --- */
 function buildCardsRadio(wrap, q) {
   // Radio row
   const row = document.createElement('div');
@@ -2043,7 +2042,7 @@ function buildSystemTypePage(wrap, q) {
   wrap.appendChild(cards);
 }
 
-/* â”€â”€â”€ Plain cards â”€â”€â”€ */
+/* --- Plain cards --- */
 function buildCards(wrap, q) {
   const cards = document.createElement('div');
   cards.className = 'opt-cards';
@@ -2067,7 +2066,7 @@ function buildCards(wrap, q) {
         return;
       }
 
-      // HVAC room solution â†’ results
+      // HVAC room solution -> results
       setTimeout(() => {
         const qs = QUESTIONS[S.solution];
         if (S.qStep < qs.length - 1) { S.qStep++; render(); }
@@ -2087,7 +2086,7 @@ function buildCards(wrap, q) {
   wrap.appendChild(cards);
 }
 
-/* â”€â”€â”€ Square footage â”€â”€â”€ */
+/* --- Square footage --- */
 function buildSqft(wrap) {
   const div = document.createElement('div');
   div.className = 'sqft-wrap';
@@ -2153,7 +2152,7 @@ function buildRoomSolution(wrap, q) {
   const cards = div.querySelector('.room-solution-cards');
   const roomImages = {
     'highwall-hvac': 'assets/tile-highwall-hvac.png',
-    casette: 'assets/tile-casette.svg',
+    casette: 'assets/tile-cassette.png',
     console: 'assets/tile-console.png',
     'mid-static-duct': 'assets/tile-mid-static-duct.svg'
   };
@@ -2181,7 +2180,7 @@ function submitRoomSolution() {
   document.getElementById('zip-modal').classList.remove('hidden');
 }
 
-/* â”€â”€â”€ Vents modal response â”€â”€â”€ */
+/* --- Vents modal response --- */
 function handleVents(hasVents) {
   document.getElementById('vents-modal').classList.add('hidden');
   S.answers.hasVents = String(hasVents);
@@ -2195,7 +2194,7 @@ function handleVents(hasVents) {
   }
 }
 
-/* â”€â”€â”€ Gas form â”€â”€â”€ */
+/* --- Gas form --- */
 function buildGasForm(wrap) {
   const f = document.createElement('div');
   f.innerHTML = `
@@ -2219,7 +2218,7 @@ function buildGasForm(wrap) {
       <div class="form-group">
         <label>Burner Type</label>
         <select id="gBurner">
-          <option value="">Selectâ€¦</option>
+          <option value="">Select...</option>
           <option value="standard">Standard</option>
           <option value="condensing">Condensing</option>
         </select>
@@ -2227,7 +2226,7 @@ function buildGasForm(wrap) {
       <div class="form-group">
         <label>Capacity (bathrooms)</label>
         <select id="gCap">
-          <option value="">Selectâ€¦</option>
+          <option value="">Select...</option>
           <option value="1">1 bathroom</option>
           <option value="2">2 bathrooms</option>
           <option value="3">3 bathrooms</option>
@@ -2237,7 +2236,7 @@ function buildGasForm(wrap) {
       <div class="form-group">
         <label>Height Available</label>
         <select id="gH">
-          <option value="">Selectâ€¦</option>
+          <option value="">Select...</option>
           <option value='standard'>Standard (60")</option>
           <option value='tall'>Tall (70"+)</option>
         </select>
@@ -2245,7 +2244,7 @@ function buildGasForm(wrap) {
       <div class="form-group">
         <label>Fuel Type</label>
         <select id="gFuel">
-          <option value="">Selectâ€¦</option>
+          <option value="">Select...</option>
           <option value="natural-gas">Natural Gas</option>
           <option value="propane">Propane</option>
         </select>
@@ -2264,7 +2263,7 @@ function submitGas() {
   showResults();
 }
 
-/* â”€â”€â”€ Electric form â”€â”€â”€ */
+/* --- Electric form --- */
 function buildElecForm(wrap) {
   const f = document.createElement('div');
   f.innerHTML = `
@@ -2272,7 +2271,7 @@ function buildElecForm(wrap) {
       <div class="form-group">
         <label>Type</label>
         <select id="eType">
-          <option value="">Selectâ€¦</option>
+          <option value="">Select...</option>
           <option value="standard">Standard Tank</option>
           <option value="marathon">Marathon</option>
         </select>
@@ -2287,7 +2286,7 @@ function buildElecForm(wrap) {
       <div class="form-group">
         <label>Amperage Available</label>
         <select id="eAmp">
-          <option value="">Selectâ€¦</option>
+          <option value="">Select...</option>
           <option value="30">30 Amp</option>
           <option value="40">40 Amp</option>
           <option value="50">50 Amp</option>
@@ -2298,7 +2297,7 @@ function buildElecForm(wrap) {
       <div class="form-group">
         <label>Capacity (bathrooms)</label>
         <select id="eCap">
-          <option value="">Selectâ€¦</option>
+          <option value="">Select...</option>
           <option value="1">1 bathroom</option>
           <option value="2">2 bathrooms</option>
           <option value="3">3 bathrooms</option>
@@ -2308,7 +2307,7 @@ function buildElecForm(wrap) {
       <div class="form-group">
         <label>Height</label>
         <select id="eH">
-          <option value='Short, 40-55"'>Short, 40â€“55"</option>
+          <option value='Short, 40-55"'>Short, 40-55"</option>
           <option value='Tall, 60"+'>Tall, 60"+</option>
         </select>
       </div>
@@ -2325,7 +2324,7 @@ function submitElec() {
   showResults();
 }
 
-/* â”€â”€â”€ Heat pump form â”€â”€â”€ */
+/* --- Heat pump form --- */
 function buildHpForm(wrap) {
   const f = document.createElement('div');
   f.innerHTML = `
@@ -2333,7 +2332,7 @@ function buildHpForm(wrap) {
       <div class="form-group">
         <label>Capacity (bathrooms)</label>
         <select id="hpCap">
-          <option value="">Selectâ€¦</option>
+          <option value="">Select...</option>
           <option value="1">1 bathroom</option>
           <option value="2">2 bathrooms</option>
           <option value="3">3 bathrooms</option>
@@ -2343,7 +2342,7 @@ function buildHpForm(wrap) {
       <div class="form-group">
         <label>Power Supply</label>
         <select id="hpPow">
-          <option value="">Selectâ€¦</option>
+          <option value="">Select...</option>
           <option value="120v">120 V</option>
           <option value="240v">240 V</option>
         </select>
@@ -2351,7 +2350,7 @@ function buildHpForm(wrap) {
       <div class="form-group">
         <label>Amperage</label>
         <select id="hpAmp">
-          <option value="">Selectâ€¦</option>
+          <option value="">Select...</option>
           <option value="15">15 Amp</option>
           <option value="20">20 Amp</option>
           <option value="30">30 Amp</option>
@@ -2368,9 +2367,9 @@ function submitHp() {
   showResults();
 }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* -------------------------------------
    RESULTS
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+------------------------------------- */
 const TITLES = { hvac:'HVAC Systems', 'water-heating':'Water Heating Solutions' };
 
 function showResults() {
@@ -2628,8 +2627,7 @@ function getRecommendationMetrics() {
     { key: 'efficiency', label: 'Energy Efficiency', icon: 'energy-home', values: ['Standard', 'Medium', 'High', 'Highest'] },
     { key: 'savings', label: 'Energy Savings', icon: 'energy-savings', values: ['Standard', 'Medium', 'High', 'Highest'] },
     { key: 'quiet', label: 'Quiet Operation', note: '(Sound Power DBA)', icon: 'quiet', values: ['Standard', 'Medium', 'High', 'Highest'] },
-    { key: 'cost', label: 'System Purchase Cost', note: '(MSRP)', icon: 'purchase-cost', values: ['$', '$$', '$$$', '$$$$'] },
-    { key: 'comfort', label: 'Precise Comfort', icon: 'comfort', values: ['Good', 'Better', 'Best', 'Ultimate'] }
+    { key: 'cost', label: 'System Purchase Cost', note: '(MSRP)', icon: 'purchase-cost', values: ['$', '$$', '$$$', '$$$$'] }
   ];
 }
 
@@ -2796,9 +2794,9 @@ function toggleAcc(hdr) {
   hdr.parentElement.classList.toggle('open');
 }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* -------------------------------------
    SVG ICONS
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+------------------------------------- */
 function svgIcon(type, size) {
   const s = size || 48;
   const icons = {
@@ -3019,7 +3017,7 @@ function productSvg(name) {
       <line x1="50" y1="32" x2="46" y2="48"/>
       <line x1="18" y1="48" x2="46" y2="48"/>
     </svg>`;
-  // Default â€“ electric tank
+  // Default - electric tank
   return `<svg width="80" height="80" viewBox="0 0 64 64" fill="none" stroke="#003B71" stroke-width="1.8" stroke-linecap="round" opacity=".55">
     <rect x="18" y="6" width="28" height="52" rx="3"/>
     <circle cx="32" cy="32" r="7"/>
@@ -3030,7 +3028,7 @@ function productSvg(name) {
   </svg>`;
 }
 
-/* â”€â”€â”€ Utility â”€â”€â”€ */
+/* --- Utility --- */
 function val(id) {
   const el = document.getElementById(id);
   return el ? el.value : '';
