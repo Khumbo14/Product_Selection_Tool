@@ -73,6 +73,11 @@
     transition: color .2s;
   }
   .solution-card:hover span { color: #003B71; }
+  .solution-card[hidden] { display: none; }
+  .solution-cards.single-option {
+    grid-template-columns: minmax(145px, 201px);
+    max-width: 201px;
+  }
 
   /* ============================
      STEP 2 - QUESTIONNAIRE
@@ -126,23 +131,6 @@
     color: #555;
     margin-bottom: 44px;
   }
-
-  /* Radio row */
-  .radio-row {
-    display: flex;
-    justify-content: center;
-    gap: 44px;
-    margin-bottom: 40px;
-  }
-  .radio-row label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 15px;
-    color: #555;
-    cursor: pointer;
-  }
-  .radio-row input[type="radio"] { width: 17px; height: 17px; accent-color: #003B71; }
 
   /* Option cards */
   .opt-cards {
@@ -279,20 +267,6 @@
   .m-btn-primary:hover { background: #002952; border-color: #002952; }
   .m-btn-outline { background: #fff; color: #003B71; border: 2px solid #003B71; }
   .m-btn-outline:hover { background: #eef4ff; }
-  .zip-input {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 11px 16px;
-    font-size: 18px;
-    text-align: center;
-    width: 170px;
-    display: block;
-    margin: 0 auto 28px;
-    outline: none;
-    transition: border-color .2s;
-  }
-  .zip-input:focus { border-color: #003B71; }
-
   /* ============================
      STEP 3 - RESULTS
   ============================ */
@@ -472,7 +446,6 @@
   }
   @media (max-width: 520px) {
     .opt-card { padding: 24px 28px; }
-    .radio-row { gap: 24px; }
   }
 
   /* GE Appliances color pass */
@@ -715,26 +688,6 @@
     margin-bottom: 58px;
   }
 
-  .radio-row {
-    gap: 36px;
-    margin-top: -25px;
-    margin-bottom: 32px;
-  }
-
-  .radio-row label {
-    color: var(--ge-muted);
-    flex-direction: column;
-    font-size: 14px;
-    font-weight: 700;
-    gap: 8px;
-    line-height: 1.25;
-    text-align: center;
-  }
-
-  .radio-row input[type="radio"] {
-    accent-color: var(--ge-blue);
-  }
-
   .option-hint {
     width: 201px;
     height: 201px;
@@ -822,8 +775,8 @@
   }
 
   .system-type-image {
-    width: 96px;
-    height: 78px;
+    width: 150px;
+    height: 82px;
     object-fit: contain;
     display: block;
   }
@@ -839,8 +792,7 @@
     font-weight: 700;
   }
 
-  .form-group select,
-  .zip-input {
+  .form-group select {
     border-color: var(--ge-line);
     border-radius: 0;
     color: var(--ge-ink);
@@ -870,10 +822,6 @@
 
   .m-btn-outline:hover {
     background: var(--ge-blue-tint);
-  }
-
-  .zip-input:focus {
-    border-color: var(--ge-blue);
   }
 
   .vents-modal-box {
@@ -1487,12 +1435,6 @@
       grid-template-columns: minmax(145px, 201px);
     }
 
-    .radio-row {
-      align-items: center;
-      flex-direction: column;
-      gap: 12px;
-    }
-
     .progress-dots {
       transform: scale(.82);
     }
@@ -1520,7 +1462,7 @@
 ============================== -->
 <div id="step-selection">
   <h2>What type of solution are you looking for?</h2>
-  <div class="solution-cards">
+  <div class="solution-cards single-option">
 
     <!-- HVAC -->
     <button class="solution-card" onclick="selectSolution('hvac')">
@@ -1540,7 +1482,7 @@
     </button>
 
     <!-- Water Heating -->
-    <button class="solution-card" onclick="selectSolution('water-heating')">
+    <button class="solution-card" onclick="selectSolution('water-heating')" hidden>
       <svg width="92" height="92" viewBox="0 0 64 64" fill="none"
            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M19 17c0-5 6-8 13-8s13 3 13 8v34c0 3-6 5-13 5s-13-2-13-5z"/>
@@ -1597,19 +1539,6 @@
   </div>
 </div>
 
-<!-- ========== ZIP MODAL ========== -->
-<div id="zip-modal" class="modal-overlay hidden">
-  <div class="modal-box">
-    <h3>What is your zip code?</h3>
-    
-    <input id="zip-input" class="zip-input" type="text" placeholder="e.g. 10001" maxlength="5"
-           oninput="this.value=this.value.replace(/\D/,'')" />
-    <div class="modal-actions">
-      <button class="m-btn m-btn-primary" onclick="handleZip()">Continue</button>
-    </div>
-  </div>
-</div>
-
 <!-- ======================================
      SCRIPTS
 ====================================== -->
@@ -1620,7 +1549,6 @@ let S = {
   solution: null,
   answers: {},
   qStep: 0,
-  radioAnswer: 'replacement',
   roomSolutionStage: 'count',
   selectedProductIndex: null
 };
@@ -1753,11 +1681,7 @@ const QUESTIONS = {
     {
       id: 'fuelType',
       q: 'What fuel type does your HVAC indoor unit use?',
-      type: 'cards-radio',
-      radio: [
-        { val: 'replacement', lbl: 'This is a system<br>for replacement' },
-        { val: 'room-addition', lbl: 'This is a system<br>for room addition' }
-      ],
+      type: 'cards',
       opts: [
         { val: 'gas-propane', lbl: 'Gas / Propane', icon: 'gas-propane' },
         { val: 'electric',    lbl: 'Electric',      icon: 'bolt'        },
@@ -1778,8 +1702,8 @@ const QUESTIONS = {
       q: 'What type of system do you have?',
       type: 'systemType',
       opts: [
-        { val: 'split-system',    lbl: 'Split System',    icon: 'split-system' },
-        { val: 'packaged-system', lbl: 'Packaged System', icon: 'packaged-system', image: 'assets/packaged-system.png' }
+        { val: 'split-system',    lbl: 'Split System',    icon: 'split-system', image: 'assets/split-system-ge.png' },
+        { val: 'packaged-system', lbl: 'Packaged System', icon: 'packaged-system', image: 'assets/packaged-system-ge.jpg' }
       ]
     },
     {
@@ -1827,7 +1751,7 @@ function showPage(id) {
 }
 
 function selectSolution(type) {
-  S = { step:'questionnaire', solution:type, answers:{}, qStep:0, radioAnswer:'replacement', roomSolutionStage:'count' };
+  S = { step:'questionnaire', solution:type, answers:{}, qStep:0, roomSolutionStage:'count' };
   showPage('step-questionnaire');
   render();
 }
@@ -1853,8 +1777,7 @@ function handleBack() {
 }
 
 function resetApp() {
-  S = { step:'selection', solution:null, answers:{}, qStep:0, radioAnswer:'replacement', roomSolutionStage:'count' };
-  document.getElementById('zip-modal').classList.add('hidden');
+  S = { step:'selection', solution:null, answers:{}, qStep:0, roomSolutionStage:'count' };
   showPage('step-selection');
 }
 
@@ -1878,8 +1801,7 @@ function render() {
   title.textContent = q.q;
   wrap.appendChild(title);
 
-  if      (q.type === 'cards-radio') buildCardsRadio(wrap, q);
-  else if (q.type === 'vents')       buildVentsPage(wrap, q);
+  if      (q.type === 'vents')       buildVentsPage(wrap, q);
   else if (q.type === 'systemType')  buildSystemTypePage(wrap, q);
   else if (q.maxSelections)          buildMultiCards(wrap, q);
   else if (q.type === 'cards')       buildCards(wrap, q);
@@ -1909,43 +1831,6 @@ function renderDots(total, current) {
       c.appendChild(l);
     }
   }
-}
-
-/* --- Cards + radio (HVAC fuel type) --- */
-function buildCardsRadio(wrap, q) {
-  // Radio row
-  const row = document.createElement('div');
-  row.className = 'radio-row';
-  q.radio.forEach(r => {
-    const lbl = document.createElement('label');
-    lbl.innerHTML = `
-      <span>${r.lbl}</span>
-      <input type="radio" name="sysType" value="${r.val}"
-        ${S.radioAnswer === r.val ? 'checked' : ''}
-        onchange="S.radioAnswer = this.value" />`;
-    row.appendChild(lbl);
-  });
-  wrap.appendChild(row);
-
-  // Opt cards
-  const cards = document.createElement('div');
-  cards.className = 'opt-cards';
-  q.opts.forEach(o => {
-    const card = document.createElement('div');
-    card.className = 'opt-card' + (S.answers[q.id] === o.val ? ' selected' : '');
-    card.innerHTML = svgIcon(o.icon, 58) + `<span>${o.lbl}</span>${o.sub ? `<small>${o.sub}</small>` : ''}`;
-    card.onclick = () => {
-      S.answers[q.id] = o.val;
-      wrap.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
-      setTimeout(() => {
-        S.qStep++;
-        render();
-      }, 280);
-    };
-    cards.appendChild(card);
-  });
-  wrap.appendChild(cards);
 }
 
 /* Multi-select cards */
@@ -2027,14 +1912,14 @@ function buildSystemTypePage(wrap, q) {
     const card = document.createElement('div');
     card.className = 'opt-card' + (S.answers[q.id] === o.val ? ' selected' : '');
     const visual = o.image
-      ? `<img class="system-type-image" src="${o.image}" alt="" />`
+      ? `<img class="system-type-image" src="${o.image}" alt="${o.lbl}" />`
       : svgIcon(o.icon, 72);
     card.innerHTML = visual + `<span>${o.lbl}</span>`;
     card.onclick = () => {
       S.answers[q.id] = o.val;
       cards.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
-      setTimeout(() => document.getElementById('zip-modal').classList.remove('hidden'), 280);
+      setTimeout(showResults, 280);
     };
     cards.appendChild(card);
   });
@@ -2101,13 +1986,6 @@ function handleSqft() {
   const v = document.getElementById('sqft-in').value;
   if (!v) return;
   S.answers.squareFootage = v;
-  document.getElementById('zip-modal').classList.remove('hidden');
-}
-function handleZip() {
-  const v = document.getElementById('zip-input').value;
-  if (!v) return;
-  S.answers.zipCode = v;
-  document.getElementById('zip-modal').classList.add('hidden');
   showResults();
 }
 
@@ -2177,7 +2055,7 @@ function buildRoomSolution(wrap, q) {
 function submitRoomSolution() {
   const selected = S.answers.roomSolution;
   if (!selected || !S.answers.roomCount) return;
-  document.getElementById('zip-modal').classList.remove('hidden');
+  showResults();
 }
 
 /* --- Vents modal response --- */
@@ -2658,36 +2536,11 @@ function getProLabel() {
 }
 
 function connectWithPro() {
-  const contractorFinderUrl = 'https://contractorfinder.geappliances.com/contractors';
-  const zipCode = String(S.answers.zipCode || '').trim();
-
-  if (/^\d{5}$/.test(zipCode)) {
-    copyZipCode(zipCode);
-    window.alert(`Your ZIP code (${zipCode}) has been copied. Paste it into the contractor finder search field.`);
-  }
-
-  window.open(contractorFinderUrl, '_blank', 'noopener,noreferrer');
-}
-
-function copyZipCode(zipCode) {
-  if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(zipCode).catch(() => copyTextFallback(zipCode));
-    return;
-  }
-
-  copyTextFallback(zipCode);
-}
-
-function copyTextFallback(text) {
-  const input = document.createElement('textarea');
-  input.value = text;
-  input.setAttribute('readonly', '');
-  input.style.position = 'fixed';
-  input.style.opacity = '0';
-  document.body.appendChild(input);
-  input.select();
-  document.execCommand('copy');
-  input.remove();
+  window.open(
+    'https://contractorfinder.geappliances.com/contractors',
+    '_blank',
+    'noopener,noreferrer'
+  );
 }
 
 function comparisonSummary() {
@@ -2859,15 +2712,18 @@ function svgIcon(type, size) {
       <path d="M12 2c-1 3.5.5 6.5-2 9 0-2-1.5-3.5-1.5-5.5C6 8 5 11 5 13a7 7 0 0014 0c0-4-3-8-7-11z"/>
     </svg>`,
     'gas-propane': `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M27 14h10v7H27z"/>
-      <path d="M24 21h16"/>
-      <rect x="19" y="21" width="26" height="36" rx="9"/>
-      <path d="M19 31h26"/>
-      <path d="M19 47h26"/>
-      <circle cx="32" cy="39" r="3"/>
+      <path d="M25 18v-6c0-3 3-5 7-5s7 2 7 5v6"/>
+      <path d="M29 12h6M23 18h18"/>
+      <path d="M23 18c-4 4-6 8-6 14v15c0 7 5 11 15 11s15-4 15-11V32c0-6-2-10-6-14z"/>
+      <path d="M18 31h28M22 58h20"/>
+      <path d="M32 35c-4 5-6 8-6 11a6 6 0 0012 0c0-3-2-6-6-11z"/>
+      <path d="M32 42c-1 2-2 3-2 4a2 2 0 004 0c0-1-1-2-2-4z"/>
     </svg>`,
-    bolt: `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+    bolt: `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 10v14M42 10v14"/>
+      <path d="M17 24h30v8c0 8-7 15-15 15s-15-7-15-15z"/>
+      <path d="M32 47v9"/>
+      <path d="M34 27l-7 9h6l-3 7 8-10h-6z"/>
     </svg>`,
     'heat-pump': `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
       <rect x="12" y="22" width="40" height="20" rx="3"/>
@@ -2876,10 +2732,11 @@ function svgIcon(type, size) {
       <line x1="44" y1="27" x2="44" y2="37"/>
     </svg>`,
     oil: `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M38 19h10a4 4 0 014 4v26a4 4 0 01-4 4H22a4 4 0 01-4-4V20a4 4 0 014-4h11"/>
-      <path d="M33 16h5v10h-5z"/>
-      <path d="M38 21l10-8 5 5-9 9"/>
-      <path d="M32 33c4 5 6 8 6 11a6 6 0 01-12 0c0-3 2-6 6-11z"/>
+      <path d="M14 20h36c5 0 8 6 8 14s-3 14-8 14H14c-5 0-8-6-8-14s3-14 8-14z"/>
+      <path d="M16 20c-4 3-5 8-5 14s1 11 5 14M48 20c4 3 5 8 5 14s-1 11-5 14"/>
+      <path d="M39 20v-8h10M44 12V8h8v4"/>
+      <path d="M16 48v7M48 48v7M12 55h8M44 55h8"/>
+      <path d="M32 26c-4 5-6 8-6 11a6 6 0 0012 0c0-3-2-6-6-11z"/>
     </svg>`,
     'highwall-hvac': `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <rect x="12" y="19" width="40" height="14" rx="2"/>
